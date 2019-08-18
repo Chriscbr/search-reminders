@@ -4,7 +4,6 @@
   "description": "Save important pages and find them through web searches!",
   "permissions": [
     "activeTab",
-    "storage",
     "https://www.google.com/search*"
   ],
   "background": {

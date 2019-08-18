@@ -1,96 +1,4 @@
-class Reminder {
-  id: number | null;
-  url: string;
-  title: string;
-  description: string;
-  keywords: string[];
-  constructor(url: string, title: string, description: string, keywords: string[]) {
-    this.id = null;
-    this.url = url;
-    this.title = title;
-    this.description = description;
-    this.keywords = keywords;
-  }
-}
-
-/**
- * Map from random IDs to Reminder objects.
- */
-class ReminderMap {
-  data: Map<number, Reminder>;
-  currentId: number;
-  constructor() {
-    // Map(number, Reminder)
-    this.data = new Map();
-    this.currentId = 0;
-  }
-
-  addReminder(reminder: Reminder) {
-    this.validateNewReminder(reminder);
-    reminder.id = this.currentId;
-    this.data.set(this.currentId, reminder);
-  }
-
-  removeReminder(reminder: Reminder) {
-    if (reminder.id === null) {
-      throw new Error('Reminder does not contain an id value.');
-    }
-    this.data.delete(reminder.id);
-  }
-
-  // private
-  validateNewReminder(reminder: Reminder) {
-    if (reminder.keywords === null || reminder.keywords.length < 0) {
-      throw new Error('Reminder must have an array of more than 0 keywords.');
-    }
-    if (reminder.id !== null) {
-      throw new Error('Reminder should not have an ID before adding it to a ReminderMap');
-    }
-    if (new Set(reminder.keywords).size !== reminder.keywords.length) {
-      throw new Error('Reminder has duplicate keywords.');
-    }
-  }
-}
-
-/**
- * Map from keywords to Reminder IDs.
- */
-class KeywordMap {
-  data: Map<string, Set<number>>
-  constructor() {
-    // Map(String, Set(number))
-    this.data = new Map();
-  }
-
-  addReminder(reminder: Reminder) {
-    if (reminder.id === null) {
-      throw new Error('Reminder does not contain an id value.');
-    }
-    reminder.keywords.forEach((keyword) => {
-      if (this.data.has(keyword)) {
-        this.data.get(keyword)!.add(reminder.id!);
-      } else {
-        this.data.set(keyword, new Set([reminder.id!]));
-      }
-    });
-  }
-
-  removeReminder(reminder: Reminder) {
-    if (reminder.id === null) {
-      throw new Error('Reminder does not contain an id value.');
-    }
-    reminder.keywords.forEach((keyword) => {
-      if (this.data.has(keyword)) {
-        this.data.get(keyword)!.delete(reminder.id!);
-        if (this.data.get(keyword)!.size === 0) {
-          this.data.delete(keyword);
-        }
-      } else {
-        throw new Error(`KeywordMap does not have ${keyword} as a key in the map.`);
-      }
-    });
-  }
-}
+import {Reminder, ReminderMap, KeywordMap} from './common';
 
 const reminderMap = new ReminderMap();
 const keywordMap = new KeywordMap();
@@ -108,11 +16,15 @@ testReminderData.forEach((reminder, index) => {
   keywordMap.addReminder(reminder);
 });
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.set({
-      reminderMap: reminderMap, 
-      keywordMap: keywordMap,
-    }, () => {
-    console.log("Test data saved into storage.");
-  });
-});
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    console.log(sender.tab ?
+                'Received message from a content script:' + sender.tab.url :
+                'Received message from the extension.');
+    if (request.operation === 'getReminderData') {
+      console.log('Sending data back to sender.');
+      sendResponse({reminderMap: reminderMap.toJSON(),
+                    keywordMap: keywordMap.toJSON()});
+    }
+  }
+);
