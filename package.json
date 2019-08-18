@@ -1,0 +1,27 @@
+{
+  "name": "search-reminders",
+  "version": "1.0.0",
+  "description": "search-reminders",
+  "main": "index.js",
+  "scripts": {
+    "watch": "webpack --config webpack/webpack.dev.js --watch",
+    "build": "webpack --config webpack/webpack.prod.js",
+    "clean": "rimraf dist"
+  },
+  "author": "Christopher Rybicki",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chriscbr/search-reminders.git"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.86",
+    "copy-webpack-plugin": "^5.0.3",
+    "rimraf": "^2.6.3",
+    "ts-loader": "^5.4.5",
+    "typescript": "~3.4.5",
+    "webpack": "~4.39.2",
+    "webpack-cli": "^3.3.7",
+    "webpack-merge": "~4.2.1"
+  }
+}

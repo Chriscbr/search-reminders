@@ -8,14 +8,14 @@
     "https://www.google.com/search*"
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["js/background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
       "matches": ["https://www.google.com/search*"],
-      "css": ["inlineReminders.css"],
-      "js": ["inlineReminders.js"]
+      "css": ["content_script.css"],
+      "js": ["js/content_script.js"]
     }
   ],
   "options_page": "options.html",

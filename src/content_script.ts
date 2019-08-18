@@ -1,4 +1,5 @@
 class RemindersBox {
+  box: Node;
   constructor() {
     this.box = this.initBox();
   }
@@ -30,10 +31,9 @@ const getKeywordsFromQuery = function(query) {
   return query.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').split(' ');
 }
 
-const promisify = function(fn) {
-  const args = Array.prototype.slice.call(arguments).slice(1);
+const promisify = function(fn, ...params) {
   return new Promise((resolve, reject) => {
-    return fn.apply(null, args.concat(result => {
+    return fn.apply(null, params.concat(result => {
       if (chrome.runtime.lastError) {
         return reject(chrome.runtime.lastError);
       }
@@ -51,18 +51,18 @@ Promise.all([getStorageItems('reminderMap'), getStorageItems('keywordMap')])
   .then(values => {
     const remindersBox = new RemindersBox();
 
-    const reminderMap = values[0];
-    const keywordMap = values[1];
+    const reminderMap = (values[0] as ReminderMap);
+    const keywordMap = (values[1] as KeywordMap);
     const keywords = getKeywordsFromQuery(getSearchQuery());
     let reminderIds = null;
     keywords.forEach(keyword => {
-      if (keywordMap.has(keyword)) {
-        reminderIds = keywordMap.get(keyword);
+      if (keywordMap.data.has(keyword)) {
+        reminderIds = keywordMap.data.get(keyword);
       }
     })
     if (reminderIds !== null) {
       reminderIds.forEach(key => {
-        const reminder = reminderMap.get(key);
+        const reminder = reminderMap.data.get(key);
         remindersBox.addReminder(reminder);
       });
     }

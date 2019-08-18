@@ -1,4 +1,9 @@
 class Reminder {
+  id: number;
+  url: string;
+  title: string;
+  description: string;
+  keywords: string[];
   constructor(url, title, description, keywords) {
     this.id = null;
     this.url = url;
@@ -12,6 +17,8 @@ class Reminder {
  * Map from random IDs to reminder data.
  */
 class ReminderMap {
+  data: Map<number, Reminder>;
+  currentId: number;
   constructor() {
     // Map(number, Reminder)
     this.data = new Map();
@@ -39,9 +46,8 @@ class ReminderMap {
     if (reminder.id !== null) {
       throw new Error('Reminder should not have an ID before adding it to a ReminderMap');
     }
-    // const keywordSet = new Set(reminder.keywords);
     if (new Set(reminder.keywords).size !== reminder.keywords.length) {
-      throw new Error(`Set of keywords has ${keywordSet.size}, but there are ${reminder.keywords.length} keywords.`);
+      throw new Error('Reminder has duplicate keywords.');
     }
   }
 }
@@ -50,6 +56,7 @@ class ReminderMap {
  * Map from keywords to reminder IDs
  */
 class KeywordMap {
+  data: Map<string, Set<number>>
   constructor() {
     // Map(String, Set(number))
     this.data = new Map();
