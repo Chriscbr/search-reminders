@@ -9,12 +9,15 @@ class RemindersBox {
     remindersDiv.className = 'remindersDiv';
 
     const searchBox = document.getElementById('search');
-    searchBox.parentElement.insertBefore(remindersDiv, searchBox);
+    if (searchBox === null) {
+      throw new Error('No div with id "search" found.');
+    }
+    searchBox.parentElement!.insertBefore(remindersDiv, searchBox);
 
     return remindersDiv;
   }
 
-  addReminder(reminder) {
+  addReminder(reminder: Reminder) {
     const reminderBox = document.createElement('div');
     reminderBox.className = 'remindersDiv';
     reminderBox.innerHTML = reminder.title;
@@ -24,16 +27,19 @@ class RemindersBox {
 
 const getSearchQuery = function() {
   const urlParams = new URLSearchParams(document.location.search.substring(1));
-  return urlParams.get('q');
+  if (!urlParams.has('q')) {
+    throw new Error('No search query found.');
+  }
+  return urlParams.get('q')!;
 };
 
-const getKeywordsFromQuery = function(query) {
+const getKeywordsFromQuery = function(query: string) {
   return query.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').split(' ');
 }
 
-const promisify = function(fn, ...params) {
+const promisify = function(fn: any, ...params: any[]) {
   return new Promise((resolve, reject) => {
-    return fn.apply(null, params.concat(result => {
+    return fn.apply(null, params.concat((result: any) => {
       if (chrome.runtime.lastError) {
         return reject(chrome.runtime.lastError);
       }
@@ -42,7 +48,7 @@ const promisify = function(fn, ...params) {
   });
 };
 
-const getStorageItems = function(param) {
+const getStorageItems = function(param: string) {
   // classic JavaScript binding weirdness here
   return promisify(chrome.storage.local.get.bind(chrome.storage.local), param);
 };
@@ -50,22 +56,28 @@ const getStorageItems = function(param) {
 Promise.all([getStorageItems('reminderMap'), getStorageItems('keywordMap')])
   .then(values => {
     const remindersBox = new RemindersBox();
-
     const reminderMap = (values[0] as ReminderMap);
     const keywordMap = (values[1] as KeywordMap);
-    const keywords = getKeywordsFromQuery(getSearchQuery());
-    let reminderIds = null;
+    const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
+    let reminderIds: Set<number> = new Set();
+
+    // collect all of the possible reminder IDs related to any of the keywords
     keywords.forEach(keyword => {
       if (keywordMap.data.has(keyword)) {
-        reminderIds = keywordMap.data.get(keyword);
+        keywordMap.data.get(keyword)!.forEach(id => {
+          reminderIds.add(id);
+        });
+        reminderIds = keywordMap.data.get(keyword)!;
       }
-    })
-    if (reminderIds !== null) {
-      reminderIds.forEach(key => {
-        const reminder = reminderMap.data.get(key);
-        remindersBox.addReminder(reminder);
-      });
-    }
+    });
+
+    reminderIds.forEach(id => {
+      const reminder = reminderMap.data.get(id);
+      if (reminder === undefined) {
+        throw new Error(`Reminder not found in reminderMap for id: ${id}`);
+      }
+      remindersBox.addReminder(reminder);
+    });
   })
   .catch(err => {
     console.log(err)

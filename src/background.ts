@@ -1,10 +1,10 @@
 class Reminder {
-  id: number;
+  id: number | null;
   url: string;
   title: string;
   description: string;
   keywords: string[];
-  constructor(url, title, description, keywords) {
+  constructor(url: string, title: string, description: string, keywords: string[]) {
     this.id = null;
     this.url = url;
     this.title = title;
@@ -14,7 +14,7 @@ class Reminder {
 }
 
 /**
- * Map from random IDs to reminder data.
+ * Map from random IDs to Reminder objects.
  */
 class ReminderMap {
   data: Map<number, Reminder>;
@@ -25,13 +25,13 @@ class ReminderMap {
     this.currentId = 0;
   }
 
-  addReminder(reminder) {
+  addReminder(reminder: Reminder) {
     this.validateNewReminder(reminder);
     reminder.id = this.currentId;
     this.data.set(this.currentId, reminder);
   }
 
-  removeReminder(reminder) {
+  removeReminder(reminder: Reminder) {
     if (reminder.id === null) {
       throw new Error('Reminder does not contain an id value.');
     }
@@ -39,7 +39,7 @@ class ReminderMap {
   }
 
   // private
-  validateNewReminder(reminder) {
+  validateNewReminder(reminder: Reminder) {
     if (reminder.keywords === null || reminder.keywords.length < 0) {
       throw new Error('Reminder must have an array of more than 0 keywords.');
     }
@@ -53,7 +53,7 @@ class ReminderMap {
 }
 
 /**
- * Map from keywords to reminder IDs
+ * Map from keywords to Reminder IDs.
  */
 class KeywordMap {
   data: Map<string, Set<number>>
@@ -62,27 +62,27 @@ class KeywordMap {
     this.data = new Map();
   }
 
-  addReminder(reminder) {
+  addReminder(reminder: Reminder) {
     if (reminder.id === null) {
       throw new Error('Reminder does not contain an id value.');
     }
     reminder.keywords.forEach((keyword) => {
       if (this.data.has(keyword)) {
-        this.data.get(keyword).add(reminder.id);
+        this.data.get(keyword)!.add(reminder.id!);
       } else {
-        this.data.set(keyword, new Set([reminder.id]));
+        this.data.set(keyword, new Set([reminder.id!]));
       }
     });
   }
 
-  removeReminder(reminder) {
+  removeReminder(reminder: Reminder) {
     if (reminder.id === null) {
       throw new Error('Reminder does not contain an id value.');
     }
     reminder.keywords.forEach((keyword) => {
       if (this.data.has(keyword)) {
-        this.data.get(keyword).delete(reminder.id);
-        if (this.data.get(keyword).size === 0) {
+        this.data.get(keyword)!.delete(reminder.id!);
+        if (this.data.get(keyword)!.size === 0) {
           this.data.delete(keyword);
         }
       } else {
