@@ -4,7 +4,7 @@
   "description": "search-reminders",
   "main": "index.js",
   "scripts": {
-    "watch": "webpack --config webpack/webpack.dev.js --watch",
+    "watch": "webpack --config webpack/webpack.dev.js --watch --progress",
     "build": "webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist"
   },

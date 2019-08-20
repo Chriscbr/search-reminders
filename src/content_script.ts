@@ -56,8 +56,11 @@ requestReminderData().then(data => {
 
   const reminderMap = ReminderMap.fromJSON(data.reminderMap);
   const keywordMap = KeywordMap.fromJSON(data.keywordMap);
-  
+
   const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
+  console.log(`Keywords found: ${keywords}`);
+
+  // Set, not a list, in order to avoid duplicate reminder IDs
   let reminderIds: Set<number> = new Set();
 
   // collect all of the possible reminder IDs related to any of the keywords
@@ -70,11 +73,13 @@ requestReminderData().then(data => {
     }
   });
 
+  console.log(`${reminderIds.size} relevant reminders found.`);
   reminderIds.forEach(id => {
     const reminder = reminderMap.data.get(id);
     if (reminder === undefined) {
       throw new Error(`Reminder not found in reminderMap for id: ${id}`);
     }
+    console.log(`reminder: ${reminder}`);
     remindersBox.addReminder(reminder);
   });
 })

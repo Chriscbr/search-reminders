@@ -37,5 +37,8 @@ module.exports = {
           ],
           {context: 'public' }
         ),
-    ]
+    ],
+    watchOptions: {
+        poll: true
+    },
 };

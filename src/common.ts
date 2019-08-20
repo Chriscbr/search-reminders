@@ -32,6 +32,10 @@ export class Reminder {
     } = JSON.parse(jsonStr);
     return new Reminder(json.url, json.title, json.description, json.keywords);
   }
+
+  toString(): string {
+    return `Reminder(${this.url}, ${this.title}, ${this.description}, [${this.keywords}]; id=${this.id})`;
+  }
 }
 
 /**
@@ -49,7 +53,7 @@ export class ReminderMap {
   addReminder(reminder: Reminder) {
     this.validateNewReminder(reminder);
     reminder.id = this.currentId;
-    this.data.set(this.currentId, reminder);
+    this.data.set(this.currentId++, reminder);
   }
 
   removeReminder(reminder: Reminder) {
