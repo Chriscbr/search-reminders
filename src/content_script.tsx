@@ -5,8 +5,6 @@ import {Reminder, ReminderMap, KeywordMap, promisify,
   ReminderDataResponse} from './common';
 import {ReminderList, ReminderItem} from './ui_components';
 
-console.log('hooray!');
-
 class RemindersBox {
   box: Node;
   constructor() {
@@ -56,45 +54,9 @@ const requestReminderData = function(): Promise<ReminderDataResponse> {
     Promise<ReminderDataResponse>;
 };
 
-// requestReminderData().then(data => {
-//   console.log('Reminder data received, processing now.');
-//   const remindersBox = new RemindersBox();
-
-//   const reminderMap = ReminderMap.fromJSON(data.reminderMap);
-//   const keywordMap = KeywordMap.fromJSON(data.keywordMap);
-
-//   const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
-//   console.log(`Keywords found: ${keywords}`);
-
-//   // Set, not a list, in order to avoid duplicate reminder IDs
-//   let reminderIds: Set<number> = new Set();
-
-//   // collect all of the possible reminder IDs related to any of the keywords
-//   keywords.forEach(keyword => {
-//     if (keywordMap.data.has(keyword)) {
-//       keywordMap.data.get(keyword)!.forEach(id => {
-//         reminderIds.add(id);
-//       });
-//       reminderIds = keywordMap.data.get(keyword)!;
-//     }
-//   });
-
-//   console.log(`${reminderIds.size} relevant reminders found.`);
-//   reminderIds.forEach(id => {
-//     const reminder = reminderMap.data.get(id);
-//     if (reminder === undefined) {
-//       throw new Error(`Reminder not found in reminderMap for id: ${id}`);
-//     }
-//     console.log(`reminder: ${reminder}`);
-//     remindersBox.addReminder(reminder);
-//   });
-// })
-// .catch(err => {
-//   console.log(err);
-// });
+const reminderList: Reminder[] = [];
 
 const remindersDiv = document.createElement('div');
-remindersDiv.className = 'remindersDiv';
 
 const searchBox = document.getElementById('search');
 if (searchBox === null) {
@@ -102,30 +64,46 @@ if (searchBox === null) {
 }
 searchBox.parentElement!.insertBefore(remindersDiv, searchBox);
 
-console.log(ReactDOM);
+let reminderListView = <ReminderList reminders={reminderList} />;
+ReactDOM.render(reminderListView, remindersDiv, () => console.log('rendered first'));
 
-// const foo = <ReminderItem></ReminderItem> as ReminderItem[]
+requestReminderData().then(data => {
+  console.log('Reminder data received, processing now.');
 
-const reminderList: ReactElement = (
-  <ReminderList>
-    <ReminderItem reminder={new Reminder(
-  'https://sweets.seriouseats.com/2013/12/the-food-lab-the-best-chocolate-chip-cookies.html',
-  'The Science of the Best Chocolate Chip Cookies | The Food Lab | Serious Eats',
-  `I've never been able to get a chocolate chip cookie exactly the way I like. I'm talking chocolate cookies that are barely crisp around the edges with a buttery, toffee-like crunch that transitions into a chewy, moist center that bends like caramel, rich with butter and big pockets of melted chocolate. I made it my goal to test each and every element from ingredients to cooking process, leaving no chocolate chip unturned in my quest for the best. 32 pounds of flour, over 100 individual tests, and 1,536 cookies later, I had my answers.`,
-  ['chocolate', 'chip', 'cookies', 'cookie', 'dessert', 'bake', 'recipe']
-)} />
-    <ReminderItem reminder={new Reminder(
-  'https://www.delish.com/cooking/recipe-ideas/a24892347/how-to-make-a-smoothie/',
-  'Best Triple Berry Smoothie - How to Make a Smoothie',
-  'This is the perfect way to make a smoothie from Delish.com.',
-  ['smoothie', 'recipe', 'delicious', 'fruit']
-)} />
-  </ReminderList>
-);
+  const reminderMap = ReminderMap.fromJSON(data.reminderMap);
+  const keywordMap = KeywordMap.fromJSON(data.keywordMap);
 
-ReactDOM.render(
-  reminderList,
-  remindersDiv,
-  () => { console.log('hello!'); }
-);
-console.log('we did it');
+  const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
+  console.log(`Keywords found: ${keywords}`);
+
+  // Set, not a list, in order to avoid duplicate reminder IDs
+  let reminderIds: Set<number> = new Set();
+
+  // collect all of the possible reminder IDs related to any of the keywords
+  keywords.forEach(keyword => {
+    if (keywordMap.data.has(keyword)) {
+      keywordMap.data.get(keyword)!.forEach(id => {
+        reminderIds.add(id);
+      });
+      reminderIds = keywordMap.data.get(keyword)!;
+    }
+  });
+
+  // TODO: keys in reminders are null for some reason
+
+  console.log(`${reminderIds.size} relevant reminders found.`);
+  reminderIds.forEach(id => {
+    const reminder = reminderMap.data.get(id);
+    if (reminder === undefined) {
+      throw new Error(`Reminder not found in reminderMap for id: ${id}`);
+    }
+    console.log(`reminder: ${reminder}`);
+    reminderList.push(reminder);
+  });
+
+  reminderListView = <ReminderList reminders={reminderList}></ReminderList>
+  ReactDOM.render(reminderListView, remindersDiv, () => console.log('rendered second'));
+})
+.catch(err => {
+  console.log(err);
+});
