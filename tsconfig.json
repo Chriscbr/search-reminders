@@ -10,6 +10,8 @@
         "noImplicitReturns": true,
         "alwaysStrict": true,
         "sourceMap": false,
+        "jsx": "react",
+        "moduleResolution": "node",
         "rootDir": "src",
         "outDir": "dist/js",
         "noEmitOnError": true,
