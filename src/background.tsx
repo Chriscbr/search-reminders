@@ -1,4 +1,20 @@
-import {ReminderStore, KeywordMap, ReminderDataResponse} from './common';
+import {KeywordMap, ReminderDataResponse, ReminderStore,
+  promisify} from './common';
+
+const chromeStorageSyncSet = function(data: object): Promise<unknown> {
+  return promisify(chrome.storage.sync.set.bind(chrome.storage.sync), data);
+};
+
+const saveDataToStorage = function(reminderStore: ReminderStore,
+                                   keywordMap: KeywordMap): Promise<unknown> {
+  console.log(reminderStore);
+  console.log(keywordMap);
+  const userData: ReminderDataResponse = {
+    reminderStore: reminderStore.toJSON(),
+    keywordMap: keywordMap.toJSON()
+  };
+  return chromeStorageSyncSet(userData);
+}
 
 const reminderStore = new ReminderStore();
 const keywordMap = new KeywordMap();
@@ -23,6 +39,12 @@ testReminderData.forEach((params, _index) => {
   keywordMap.add(reminder);
 });
 
+saveDataToStorage(reminderStore, keywordMap)
+  .then(() => console.log('Saved data to sync storage.'))
+  .catch((error) => {
+    console.log(`Error occurred saving data to sync storage: ${error}`)
+  });
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     console.log(sender.tab ?
@@ -35,6 +57,22 @@ chrome.runtime.onMessage.addListener(
         keywordMap: keywordMap.toJSON()
       };
       sendResponse(response);
+    } else if (request.operation === 'addTestData') {
+      console.log('Adding test data.');
+      testReminderData.forEach((params, _index) => {
+        const reminder = reminderStore.create(params);
+        keywordMap.add(reminder);
+      });
+      saveDataToStorage(reminderStore, keywordMap)
+        .then(() => {
+          console.log('Saved data to sync storage.');
+          sendResponse('SUCCESS'); // TODO: set up receiver
+        })
+        .catch((error) => {
+          console.log(`Error occurred saving data to sync storage: ${error}`);
+          sendResponse('ERROR'); // TODO: set up receiver to handle message
+        });
+      // TODO: handle deleteSavedData case
     }
   }
 );

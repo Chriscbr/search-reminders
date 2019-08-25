@@ -170,6 +170,11 @@ export class KeywordMap {
   }
 }
 
+export type ReminderDataResponse = {
+  reminderStore: string;
+  keywordMap: string;
+};
+
 export const promisify = function(fn: Function, ...params: unknown[]): Promise<unknown> {
   return new Promise((resolve, reject): void => {
     return fn.apply(null, params.concat((result: unknown) => {
@@ -181,7 +186,6 @@ export const promisify = function(fn: Function, ...params: unknown[]): Promise<u
   });
 };
 
-export type ReminderDataResponse = {
-  reminderStore: string;
-  keywordMap: string;
+export const chromeRuntimeSendMessage = function(data: object): Promise<unknown> {
+  return promisify(chrome.runtime.sendMessage.bind(chrome.runtime), data);
 };

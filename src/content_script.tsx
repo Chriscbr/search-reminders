@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Reminder, ReminderStore, KeywordMap, promisify,
+import {Reminder, ReminderStore, KeywordMap, chromeRuntimeSendMessage,
   ReminderDataResponse} from './common';
 import {ReminderList} from './ui_components';
 
@@ -17,13 +17,9 @@ const getKeywordsFromQuery = function(query: string): string[] {
   return query.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').split(' ');
 };
 
-const sendRequest = function(data: object): Promise<unknown> {
-  return promisify(chrome.runtime.sendMessage.bind(chrome.runtime), data);
-};
-
 const requestReminderData = function(): Promise<ReminderDataResponse> {
   console.log('Sending a request for Reminder data now.');
-  return sendRequest({operation: 'getReminderData'}) as
+  return chromeRuntimeSendMessage({ operation: 'getReminderData' }) as
     Promise<ReminderDataResponse>;
 };
 
@@ -65,8 +61,6 @@ requestReminderData().then(data => {
       reminderIds = keywordId;
     }
   });
-
-  // TODO: keys in reminders are null for some reason
 
   console.log(`${reminderIds.size} relevant reminders found.`);
   reminderIds.forEach(id => {
