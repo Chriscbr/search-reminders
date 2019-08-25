@@ -12,26 +12,27 @@ export class Reminder {
   description: string;
   keywords: string[];
 
-  constructor(reminderParams: ReminderParams, id: number) {
-    this.validateParams(reminderParams);
+  constructor(id: number, url: string, title: string, description: string, keywords: string[]) {
     this.id = id;
-    this.url = reminderParams.url;
-    this.title = reminderParams.title;
-    this.description = reminderParams.description;
-    this.keywords = reminderParams.keywords;
+    this.url = url;
+    this.title = title;
+    this.description = description;
+    this.keywords = keywords;
+    this.validateParams();
   }
 
-  private validateParams(params: ReminderParams): void {
-    if (params.keywords === null || params.keywords.length < 0) {
+  private validateParams(): void {
+    if (this.keywords === null || this.keywords.length < 0) {
       throw new Error('Reminder must have an array of more than 0 keywords.');
     }
-    if (new Set(params.keywords).size !== params.keywords.length) {
+    if (new Set(this.keywords).size !== this.keywords.length) {
       throw new Error('Reminder has duplicate keywords.');
     }
   }
 
   toJSON(): string {
     return JSON.stringify({
+      id: this.id,
       url: this.url,
       title: this.title,
       description: this.description,
@@ -47,17 +48,17 @@ export class Reminder {
       description: string;
       keywords: string[];
     } = JSON.parse(jsonStr);
-    return new Reminder({
-      url: json.url,
-      title: json.title,
-      description: json.description,
-      keywords: json.keywords},
-      json.id
+    return new Reminder(
+      json.id,
+      json.url,
+      json.title,
+      json.description,
+      json.keywords,
     );
   }
 
   toString(): string {
-    return `Reminder(${this.url}, ${this.title}, ${this.description}, [${this.keywords}]; id=${this.id})`;
+    return `Reminder(${this.id}, ${this.url}, ${this.title}, ${this.description}, [${this.keywords}])`;
   }
 }
 
@@ -74,7 +75,9 @@ export class ReminderStore {
   }
 
   create(reminderParams: ReminderParams): Reminder {
-    const reminder = new Reminder(reminderParams, this.currentId);
+    const {url, title, description, keywords} = {...reminderParams};
+    const reminder = new Reminder(
+      this.currentId, url, title, description, keywords);
     reminder.id = this.currentId;
     this.data.set(this.currentId++, reminder);
     return reminder;

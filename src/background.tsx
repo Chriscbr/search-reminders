@@ -1,4 +1,4 @@
-import {ReminderStore, KeywordMap} from './common';
+import {ReminderStore, KeywordMap, ReminderDataResponse} from './common';
 
 const reminderStore = new ReminderStore();
 const keywordMap = new KeywordMap();
@@ -30,8 +30,11 @@ chrome.runtime.onMessage.addListener(
                 'Received message from the extension.');
     if (request.operation === 'getReminderData') {
       console.log('Sending data back to sender.');
-      sendResponse({reminderMap: reminderStore.toJSON(),
-                    keywordMap: keywordMap.toJSON()});
+      const response: ReminderDataResponse = {
+        reminderStore: reminderStore.toJSON(),
+        keywordMap: keywordMap.toJSON()
+      };
+      sendResponse(response);
     }
   }
 );
