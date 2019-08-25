@@ -7,17 +7,13 @@ module.exports = {
         popup: path.join(__dirname, srcDir + 'popup.tsx'),
         options: path.join(__dirname, srcDir + 'options.tsx'),
         background: path.join(__dirname, srcDir + 'background.tsx'),
-        content_script: path.join(__dirname, srcDir + 'content_script.tsx')
+        contentScript: path.join(__dirname, srcDir + 'content_script.tsx')
     },
     output: {
         path: path.join(__dirname, '../dist/js'),
         filename: '[name].js'
     },
     optimization: {
-        // splitChunks: {
-        //     name: 'vendor',
-        //     chunks: 'initial'
-        // }
         runtimeChunk: false
     },
     module: {

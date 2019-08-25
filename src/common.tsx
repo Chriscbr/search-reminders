@@ -1,17 +1,33 @@
+interface ReminderParams {
+  url: string;
+  title: string;
+  description: string;
+  keywords: string[];
+}
+
 export class Reminder {
-  id: number | null;
+  id: number;
   url: string;
   title: string;
   description: string;
   keywords: string[];
 
-  constructor(url: string, title: string, description: string,
-      keywords: string[]) {
-    this.id = null;
-    this.url = url;
-    this.title = title;
-    this.description = description;
-    this.keywords = keywords;
+  constructor(reminderParams: ReminderParams, id: number) {
+    this.validateParams(reminderParams);
+    this.id = id;
+    this.url = reminderParams.url;
+    this.title = reminderParams.title;
+    this.description = reminderParams.description;
+    this.keywords = reminderParams.keywords;
+  }
+
+  private validateParams(params: ReminderParams): void {
+    if (params.keywords === null || params.keywords.length < 0) {
+      throw new Error('Reminder must have an array of more than 0 keywords.');
+    }
+    if (new Set(params.keywords).size !== params.keywords.length) {
+      throw new Error('Reminder has duplicate keywords.');
+    }
   }
 
   toJSON(): string {
@@ -23,14 +39,21 @@ export class Reminder {
     });
   }
 
-  static fromJSON(jsonStr: string) {
+  static fromJSON(jsonStr: string): Reminder {
     const json: {
-      url: string,
-      title: string,
-      description: string,
-      keywords: string[]
+      id: number;
+      url: string;
+      title: string;
+      description: string;
+      keywords: string[];
     } = JSON.parse(jsonStr);
-    return new Reminder(json.url, json.title, json.description, json.keywords);
+    return new Reminder({
+      url: json.url,
+      title: json.title,
+      description: json.description,
+      keywords: json.keywords},
+      json.id
+    );
   }
 
   toString(): string {
@@ -41,7 +64,7 @@ export class Reminder {
 /**
  * Map from random IDs to Reminder objects.
  */
-export class ReminderMap {
+export class ReminderStore {
   data: Map<number, Reminder>;
   currentId: number;
 
@@ -50,29 +73,18 @@ export class ReminderMap {
     this.currentId = 0;
   }
 
-  addReminder(reminder: Reminder) {
-    this.validateNewReminder(reminder);
+  create(reminderParams: ReminderParams): Reminder {
+    const reminder = new Reminder(reminderParams, this.currentId);
     reminder.id = this.currentId;
     this.data.set(this.currentId++, reminder);
+    return reminder;
   }
 
-  removeReminder(reminder: Reminder) {
+  removeReminder(reminder: Reminder): void {
     if (reminder.id === null) {
       throw new Error('Reminder does not contain an id value.');
     }
     this.data.delete(reminder.id);
-  }
-
-  private validateNewReminder(reminder: Reminder) {
-    if (reminder.keywords === null || reminder.keywords.length < 0) {
-      throw new Error('Reminder must have an array of more than 0 keywords.');
-    }
-    if (reminder.id !== null) {
-      throw new Error('Reminder should not already have an ID assigned.');
-    }
-    if (new Set(reminder.keywords).size !== reminder.keywords.length) {
-      throw new Error('Reminder has duplicate keywords.');
-    }
   }
 
   toJSON(): string {
@@ -82,17 +94,17 @@ export class ReminderMap {
     })]);
   }
 
-  static fromJSON(jsonStr: string): ReminderMap {
+  static fromJSON(jsonStr: string): ReminderStore {
     const json: [
       number,
       [number, string][]
     ] = JSON.parse(jsonStr);
-    const reminderMap = new ReminderMap();
-    reminderMap.currentId = json[0];
-    reminderMap.data = new Map(json[1].map(pair => {
+    const reminderStore = new ReminderStore();
+    reminderStore.currentId = json[0];
+    reminderStore.data = new Map(json[1].map(pair => {
       return [pair[0], Reminder.fromJSON(pair[1])];
     }));
-    return reminderMap;
+    return reminderStore;
   }
 } 
 
@@ -106,27 +118,31 @@ export class KeywordMap {
     this.data = new Map();
   }
 
-  addReminder(reminder: Reminder) {
+  add(reminder: Reminder): void {
     if (reminder.id === null) {
       throw new Error('Reminder does not contain an id value.');
     }
+    const reminderId = reminder.id;
     reminder.keywords.forEach((keyword) => {
-      if (this.data.has(keyword)) {
-        this.data.get(keyword)!.add(reminder.id!);
+      const keywordIdSet = this.data.get(keyword);
+      if (keywordIdSet !== undefined) {
+        keywordIdSet.add(reminderId);
       } else {
-        this.data.set(keyword, new Set([reminder.id!]));
+        this.data.set(keyword, new Set([reminderId]));
       }
     });
   }
 
-  removeReminder(reminder: Reminder) {
+  remove(reminder: Reminder): void {
     if (reminder.id === null) {
       throw new Error('Reminder does not contain an id value.');
     }
+    const reminderId = reminder.id;
     reminder.keywords.forEach((keyword) => {
-      if (this.data.has(keyword)) {
-        this.data.get(keyword)!.delete(reminder.id!);
-        if (this.data.get(keyword)!.size === 0) {
+      const keywordIdSet = this.data.get(keyword);
+      if (keywordIdSet !== undefined) {
+        keywordIdSet.delete(reminderId);
+        if (keywordIdSet.size === 0) {
           this.data.delete(keyword);
         }
       } else {
@@ -151,9 +167,9 @@ export class KeywordMap {
   }
 }
 
-export const promisify = function(fn: any, ...params: any[]) {
-  return new Promise((resolve, reject) => {
-    return fn.apply(null, params.concat((result: any) => {
+export const promisify = function(fn: Function, ...params: unknown[]): Promise<unknown> {
+  return new Promise((resolve, reject): void => {
+    return fn.apply(null, params.concat((result: unknown) => {
       if (chrome.runtime.lastError) {
         return reject(chrome.runtime.lastError);
       }
@@ -163,6 +179,6 @@ export const promisify = function(fn: any, ...params: any[]) {
 };
 
 export type ReminderDataResponse = {
-  reminderMap: string,
-  keywordMap: string
+  reminderStore: string;
+  keywordMap: string;
 };

@@ -1,25 +1,26 @@
-import {Reminder, ReminderMap, KeywordMap} from './common';
+import {ReminderStore, KeywordMap} from './common';
 
-const reminderMap = new ReminderMap();
+const reminderStore = new ReminderStore();
 const keywordMap = new KeywordMap();
 
-const testReminderData = new Array();
-testReminderData.push(new Reminder(
-  'https://sweets.seriouseats.com/2013/12/the-food-lab-the-best-chocolate-chip-cookies.html',
-  'The Science of the Best Chocolate Chip Cookies | The Food Lab | Serious Eats',
-  `I've never been able to get a chocolate chip cookie exactly the way I like. I'm talking chocolate cookies that are barely crisp around the edges with a buttery, toffee-like crunch that transitions into a chewy, moist center that bends like caramel, rich with butter and big pockets of melted chocolate. I made it my goal to test each and every element from ingredients to cooking process, leaving no chocolate chip unturned in my quest for the best. 32 pounds of flour, over 100 individual tests, and 1,536 cookies later, I had my answers.`,
-  ['chocolate', 'chip', 'cookies', 'cookie', 'dessert', 'bake', 'recipe']
-));
-testReminderData.push(new Reminder(
-  'https://www.delish.com/cooking/recipe-ideas/a24892347/how-to-make-a-smoothie/',
-  'Best Triple Berry Smoothie - How to Make a Smoothie',
-  'This is the perfect way to make a smoothie from Delish.com.',
-  ['smoothie', 'recipe', 'delicious', 'fruit']
-))
+const testReminderData = [
+  {
+    url: 'https://sweets.seriouseats.com/2013/12/the-food-lab-the-best-chocolate-chip-cookies.html',
+    title: 'The Science of the Best Chocolate Chip Cookies | The Food Lab | Serious Eats',
+    description: `I've never been able to get a chocolate chip cookie exactly the way I like. I'm talking chocolate cookies that are barely crisp around the edges with a buttery, toffee-like crunch that transitions into a chewy, moist center that bends like caramel, rich with butter and big pockets of melted chocolate. I made it my goal to test each and every element from ingredients to cooking process, leaving no chocolate chip unturned in my quest for the best. 32 pounds of flour, over 100 individual tests, and 1,536 cookies later, I had my answers.`,
+    keywords: ['chocolate', 'chip', 'cookies', 'cookie', 'dessert', 'bake', 'recipe']
+  },
+  {
+    url: 'https://www.delish.com/cooking/recipe-ideas/a24892347/how-to-make-a-smoothie/',
+    title: 'Best Triple Berry Smoothie - How to Make a Smoothie',
+    description: 'This is the perfect way to make a smoothie from Delish.com.',
+    keywords: ['smoothie', 'recipe', 'delicious', 'fruit']
+  }
+];
 
-testReminderData.forEach((reminder, index) => {
-  reminderMap.addReminder(reminder);
-  keywordMap.addReminder(reminder);
+testReminderData.forEach((params, _index) => {
+  const reminder = reminderStore.create(params);
+  keywordMap.add(reminder);
 });
 
 chrome.runtime.onMessage.addListener(
@@ -29,7 +30,7 @@ chrome.runtime.onMessage.addListener(
                 'Received message from the extension.');
     if (request.operation === 'getReminderData') {
       console.log('Sending data back to sender.');
-      sendResponse({reminderMap: reminderMap.toJSON(),
+      sendResponse({reminderMap: reminderStore.toJSON(),
                     keywordMap: keywordMap.toJSON()});
     }
   }

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { FunctionComponent } from 'react';
 import { Reminder } from './common';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Card, CardActions, CardContent,
@@ -31,16 +30,15 @@ const useStyles = makeStyles({
 });
 
 interface ReminderListProps {
-  reminders: Reminder[]
+  reminders: Reminder[];
 }
 
-interface ReminderList extends FunctionComponent<ReminderListProps> {}
+// interface ReminderList extends FunctionComponent<ReminderListProps> {}
 
-export function ReminderList(props: ReminderListProps) {
-  const classes = useStyles();
+export function ReminderList(props: ReminderListProps): JSX.Element {
   const { reminders } = props;
   const reminderItems = reminders.map((reminder) =>
-    <ReminderItem reminder={reminder} key={reminder.id!}/>
+    <ReminderItem reminder={reminder} key={reminder.id}/>
   );
 
   return (
@@ -53,14 +51,13 @@ export function ReminderList(props: ReminderListProps) {
   );
 }
 
-// using 'Omit' will ensure there are no children to a ReminderItem
 interface ReminderItemProps {
-  reminder: Reminder
+  reminder: Reminder;
 }
 
-interface ReminderItem extends FunctionComponent<ReminderItemProps> {}
+// interface ReminderItem extends FunctionComponent<ReminderItemProps> {}
 
-export function ReminderItem(props: ReminderItemProps) {
+export function ReminderItem(props: ReminderItemProps): JSX.Element {
   const classes = useStyles();
   const { reminder } = props;
   return (

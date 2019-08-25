@@ -6,6 +6,7 @@
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch --progress",
     "build": "webpack --config webpack/webpack.prod.js",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "clean": "rimraf dist"
   },
   "author": "Christopher Rybicki",
@@ -23,7 +24,11 @@
     "react-dom": "^16.9.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
     "copy-webpack-plugin": "^5.0.3",
+    "eslint": "^6.2.2",
+    "eslint-plugin-react": "^7.14.3",
     "rimraf": "^2.6.3",
     "ts-loader": "^5.4.5",
     "typescript": "~3.4.5",

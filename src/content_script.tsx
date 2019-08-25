@@ -1,50 +1,23 @@
 import * as React from 'react';
-import {ReactElement} from 'react';
 import * as ReactDOM from 'react-dom';
-import {Reminder, ReminderMap, KeywordMap, promisify,
+import {Reminder, ReminderStore, KeywordMap, promisify,
   ReminderDataResponse} from './common';
-import {ReminderList, ReminderItem} from './ui_components';
+import {ReminderList} from './ui_components';
 
-class RemindersBox {
-  box: Node;
-  constructor() {
-    this.box = this.initBox();
-  }
-
-  initBox() {
-    const remindersDiv = document.createElement('div');
-    remindersDiv.className = 'remindersDiv';
-
-    const searchBox = document.getElementById('search');
-    if (searchBox === null) {
-      throw new Error('No div with id "search" found.');
-    }
-    searchBox.parentElement!.insertBefore(remindersDiv, searchBox);
-
-    return remindersDiv;
-  }
-
-  addReminder(reminder: Reminder) {
-    const reminderBox = document.createElement('div');
-    reminderBox.className = 'remindersDiv';
-    reminderBox.innerHTML = reminder.title;
-    this.box.appendChild(reminderBox);
-  }
-}
-
-const getSearchQuery = function() {
+const getSearchQuery = function(): string {
   const urlParams = new URLSearchParams(document.location.search.substring(1));
-  if (!urlParams.has('q')) {
+  const query = urlParams.get('q');
+  if (!query) {
     throw new Error('No search query found.');
   }
-  return urlParams.get('q')!;
+  return query;
 };
 
-const getKeywordsFromQuery = function(query: string) {
+const getKeywordsFromQuery = function(query: string): string[] {
   return query.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').split(' ');
 };
 
-const sendRequest = function(data: object) {
+const sendRequest = function(data: object): Promise<unknown> {
   return promisify(chrome.runtime.sendMessage.bind(chrome.runtime), data);
 };
 
@@ -62,7 +35,10 @@ const searchBox = document.getElementById('search');
 if (searchBox === null) {
   throw new Error('No div with id "search" found.');
 }
-searchBox.parentElement!.insertBefore(remindersDiv, searchBox);
+if (searchBox.parentNode === null) {
+  throw new Error('Search div does not have a parent.');
+}
+searchBox.parentNode.insertBefore(remindersDiv, searchBox);
 
 let reminderListView = <ReminderList reminders={reminderList} />;
 ReactDOM.render(reminderListView, remindersDiv, () => console.log('rendered first'));
@@ -70,7 +46,7 @@ ReactDOM.render(reminderListView, remindersDiv, () => console.log('rendered firs
 requestReminderData().then(data => {
   console.log('Reminder data received, processing now.');
 
-  const reminderMap = ReminderMap.fromJSON(data.reminderMap);
+  const reminderStore = ReminderStore.fromJSON(data.reminderStore);
   const keywordMap = KeywordMap.fromJSON(data.keywordMap);
 
   const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
@@ -81,11 +57,12 @@ requestReminderData().then(data => {
 
   // collect all of the possible reminder IDs related to any of the keywords
   keywords.forEach(keyword => {
-    if (keywordMap.data.has(keyword)) {
-      keywordMap.data.get(keyword)!.forEach(id => {
+    const keywordId = keywordMap.data.get(keyword);
+    if (keywordId !== undefined) {
+      keywordId.forEach(id => {
         reminderIds.add(id);
       });
-      reminderIds = keywordMap.data.get(keyword)!;
+      reminderIds = keywordId;
     }
   });
 
@@ -93,7 +70,7 @@ requestReminderData().then(data => {
 
   console.log(`${reminderIds.size} relevant reminders found.`);
   reminderIds.forEach(id => {
-    const reminder = reminderMap.data.get(id);
+    const reminder = reminderStore.data.get(id);
     if (reminder === undefined) {
       throw new Error(`Reminder not found in reminderMap for id: ${id}`);
     }
