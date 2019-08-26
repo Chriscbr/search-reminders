@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Reminder, ReminderStore, KeywordMap,
-  ReminderDataResponse} from './common';
-import {ReminderList} from './ui_components';
+import { Reminder, ReminderStore, KeywordMap,
+  ReminderDataResponse } from './common';
+import { ReminderList } from './ui_components';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
 
 // gets search query from the URL, e.g. google.com/search?q=fresh%23cookies

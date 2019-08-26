@@ -1,8 +1,13 @@
 import * as React from 'react';
 import { Reminder } from './common';
-import { makeStyles } from '@material-ui/core/styles';
-import { Button, Card, CardActions, CardContent,
-  Typography } from '@material-ui/core';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import Delete from '@material-ui/icons/Delete';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles({
   reminderListWrapper: {
@@ -32,6 +37,12 @@ const useStyles = makeStyles({
     WebkitBoxOrient: 'vertical',
     WebkitLineClamp: 3,
     display: '-webkit-box',
+  },
+  extendedIcon: {
+    marginRight: '5px',
+  },
+  grow: {
+    flexGrow: 1,
   },
 });
 
@@ -71,7 +82,23 @@ export function ReminderItem(props: ReminderItemProps): JSX.Element {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" href={reminder.url}>{"Open"}</Button>
+        <Button
+            size="small"
+            href={reminder.url}
+            target="_blank"
+            aria-label="open"
+          >
+          <OpenInNew className={classes.extendedIcon} fontSize="small" />
+          Open
+        </Button>
+        <div className={classes.grow}></div>
+        <Button
+            size="small"
+            aria-label="open"
+          >
+          <Delete className={classes.extendedIcon} fontSize="small" />
+          Remove
+        </Button>
       </CardActions>
     </Card>
   );
