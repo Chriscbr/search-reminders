@@ -83,11 +83,14 @@ export class ReminderStore {
     return reminder;
   }
 
-  removeReminder(reminder: Reminder): void {
-    if (reminder.id === null) {
-      throw new Error('Reminder does not contain an id value.');
+  remove(reminderId: number): Reminder {
+    const reminder = this.data.get(reminderId);
+    if (reminder === undefined) {
+      throw new Error(`Invalid reminderId: ${reminderId}`);
+    } else {
+      this.data.delete(reminderId);
+      return reminder;
     }
-    this.data.delete(reminder.id);
   }
 
   clear(): void {

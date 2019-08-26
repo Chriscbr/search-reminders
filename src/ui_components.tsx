@@ -1,5 +1,8 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { Reminder } from './common';
+import { chromeRuntimeSendMessage } from './chrome_helpers';
+
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import Delete from '@material-ui/icons/Delete';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -46,15 +49,57 @@ const useStyles = makeStyles({
   },
 });
 
-type ReminderListProps = { reminders: Reminder[] };
+type ReminderAppProps = {
+  initReminders: Reminder[];
+}
 
-export function ReminderList(props: ReminderListProps): JSX.Element | null {
-  const classes = useStyles();
-  const { reminders } = props;
-  const reminderItems = reminders.map((reminder) =>
-    <ReminderItem reminder={reminder} key={reminder.id}/>
-  );
+export function ReminderApp(props: ReminderAppProps): JSX.Element | null {
+  const [reminders, setReminders] = useState(props.initReminders);
+  const deleteButtonHandler = (event: React.MouseEvent, reminderId: number): void => {
+
+    // update the state first
+    const remindersCopy = [...reminders];
+    const index = remindersCopy.findIndex(
+      (reminder: Reminder): boolean => reminder.id === reminderId);
+    if (index === -1) {
+      console.error(`Error removing reminderId ${reminderId} from reminder list:`);
+      console.error(reminders);
+    }
+    remindersCopy.splice(index, 1);
+    setReminders(remindersCopy);
+    console.log(`Reminder with id ${reminderId} removed.`);
+
+    // update the copy in local storage
+    chromeRuntimeSendMessage({ operation: 'deleteReminder', index: index })
+      .then((response) => console.log(`deleteReminder message send, recieved response: ${response}`))
+      .catch((error) => console.log(`Error sending deleteReminder message: ${error}`));
+  }
   if (reminders.length === 0) return null;
+
+  return (
+    <ReminderList
+      reminders={reminders}
+      deleteButtonHandler={deleteButtonHandler}
+    />
+  );
+}
+
+type ReminderListProps = {
+  reminders: Reminder[];
+  deleteButtonHandler: (event: React.MouseEvent, reminderId: number) => void;
+};
+
+export function ReminderList(props: ReminderListProps): JSX.Element {
+  const classes = useStyles();
+  const { reminders, deleteButtonHandler } = props;
+
+  const reminderItems = reminders.map((reminder) =>
+    <ReminderItem
+      reminder={reminder}
+      key={reminder.id}
+      deleteButtonHandler={deleteButtonHandler}
+    />
+  );
 
   return (
     <div className={classes.reminderListWrapper}>
@@ -66,11 +111,15 @@ export function ReminderList(props: ReminderListProps): JSX.Element | null {
   );
 }
 
-type ReminderItemProps = { reminder: Reminder };
+type ReminderItemProps = {
+  reminder: Reminder;
+  deleteButtonHandler: (event: React.MouseEvent, reminderId: number) => void;
+};
 
 export function ReminderItem(props: ReminderItemProps): JSX.Element {
   const classes = useStyles();
-  const { reminder } = props;
+  const { reminder, deleteButtonHandler } = props;
+
   return (
     <Card className={classes.reminderCard}>
       <CardContent className={classes.reminderCardContent}>
@@ -95,6 +144,7 @@ export function ReminderItem(props: ReminderItemProps): JSX.Element {
         <Button
             size="small"
             aria-label="open"
+            onClick={(event): void => deleteButtonHandler(event, reminder.id)}
           >
           <Delete className={classes.extendedIcon} fontSize="small" />
           Remove

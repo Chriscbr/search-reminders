@@ -40,6 +40,14 @@ const saveLocalDataToStorage = function(reminderStore: ReminderStore,
   return chromeStorageSyncSet(userData);
 }
 
+const deleteReminder = function(reminderStore: ReminderStore,
+                                keywordMap: KeywordMap,
+                                reminderId: number): void {
+  console.log(reminderStore);
+  const reminder = reminderStore.remove(reminderId);
+  keywordMap.remove(reminder);
+};
+
 const deleteAllLocalData = function(reminderStore: ReminderStore,
                                     keywordMap: KeywordMap): void {
   reminderStore.clear();
@@ -91,8 +99,23 @@ const addMessageListener = function(reminderStore: ReminderStore,
             sendResponse('SUCCESS');
           })
           .catch((error) => {
-            console.error(`Error occured deleting saved data: ${error}`);
+            console.error(`Error occured updating sync storage: ${error}`);
             console.log('Sending response to deleteTestData: ERROR');
+            sendResponse('ERROR');
+          });
+
+      } else if (request.operation === 'deleteReminder') {
+
+        deleteReminder(reminderStore, keywordMap, request.index);
+        saveLocalDataToStorage(reminderStore, keywordMap)
+          .then(() => {
+            console.log('Deleted item and updated sync storage.');
+            console.log('Sending response to deleteReminder: SUCCESS');
+            sendResponse('SUCCESS');
+          })
+          .catch((error) => {
+            console.error(`Error occured updating sync storage: ${error}`);
+            console.log('Sending response to deleteReminder: ERROR');
             sendResponse('ERROR');
           });
 

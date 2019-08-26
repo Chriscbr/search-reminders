@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Reminder, ReminderStore, KeywordMap,
   ReminderDataResponse } from './common';
-import { ReminderList } from './ui_components';
+import { ReminderApp } from './ui_components';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
 
 // gets search query from the URL, e.g. google.com/search?q=fresh%23cookies
@@ -25,9 +25,7 @@ const requestReminderData = function(): Promise<ReminderDataResponse> {
     Promise<ReminderDataResponse>;
 };
 
-const reminderList: Reminder[] = [];
-
-const remindersDiv = document.createElement('div');
+const injectionPoint = document.createElement('div');
 
 const searchBox = document.getElementById('search');
 if (searchBox === null) {
@@ -36,10 +34,7 @@ if (searchBox === null) {
 if (searchBox.parentNode === null) {
   throw new Error('Search div does not have a parent.');
 }
-searchBox.parentNode.insertBefore(remindersDiv, searchBox);
-
-let reminderListView = <ReminderList reminders={reminderList} />;
-ReactDOM.render(reminderListView, remindersDiv, () => console.log('rendered first'));
+searchBox.parentNode.insertBefore(injectionPoint, searchBox);
 
 requestReminderData().then(data => {
   console.log('Reminder data received, processing now.');
@@ -65,6 +60,7 @@ requestReminderData().then(data => {
   });
 
   console.log(`${reminderIds.size} relevant reminders found.`);
+  const reminderList: Reminder[] = [];
   reminderIds.forEach(id => {
     const reminder = reminderStore.data.get(id);
     if (reminder === undefined) {
@@ -74,8 +70,8 @@ requestReminderData().then(data => {
     reminderList.push(reminder);
   });
 
-  reminderListView = <ReminderList reminders={reminderList}></ReminderList>
-  ReactDOM.render(reminderListView, remindersDiv, () => console.log('rendered second'));
+  const reminderApp = <ReminderApp initReminders={reminderList} />;
+  ReactDOM.render(reminderApp, injectionPoint, () => console.log('ReminderApp rendered.'));
 })
 .catch(err => {
   console.log(err);
