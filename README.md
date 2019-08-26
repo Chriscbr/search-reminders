@@ -10,6 +10,8 @@ reminder based on it
     - Add feature: on settings page, click button to delete all data
 - Add local build / deployment instructions
 - Add ability on options page to see list of saved pages
+- Handle duplicate webpages (create another hashmap?) / prevent duplicates from
+occurring in the reminder store
 - Add animation for when reminder list loads onto page
 
 # Data flow
