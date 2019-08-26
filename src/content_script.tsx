@@ -5,6 +5,7 @@ import {Reminder, ReminderStore, KeywordMap,
 import {ReminderList} from './ui_components';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
 
+// gets search query from the URL, e.g. google.com/search?q=fresh%23cookies
 const getSearchQuery = function(): string {
   const urlParams = new URLSearchParams(document.location.search.substring(1));
   const query = urlParams.get('q');

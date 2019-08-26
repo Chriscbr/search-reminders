@@ -6,13 +6,12 @@ future uses
 - Add back local storage for saving saved webpage data
 - Add feature: on any webpage, click extension and click button to creating a
 reminder based on it
-    - Add feature: on settings page, click button to add test data
-    - Add feature: on settings page, click button to delete all data
 - Add local build / deployment instructions
 - Add ability on options page to see list of saved pages
 - Handle duplicate webpages (create another hashmap?) / prevent duplicates from
 occurring in the reminder store
 - Add animation for when reminder list loads onto page
+- Support different search engines, like DuckDuckGo
 
 # Data flow
 - `background.js` is the "master" process, in the sense that it is the only script that

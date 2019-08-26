@@ -5,6 +5,12 @@ import { Button, Card, CardActions, CardContent,
   Typography } from '@material-ui/core';
 
 const useStyles = makeStyles({
+  reminderListWrapper: {
+    marginBottom: '20px',
+  },
+  reminderListTitle: {
+    marginBottom: '15px',
+  },
   reminderCard: {
     marginBottom: '10px',
   },
@@ -29,33 +35,27 @@ const useStyles = makeStyles({
   },
 });
 
-interface ReminderListProps {
-  reminders: Reminder[];
-}
+type ReminderListProps = { reminders: Reminder[] };
 
-// interface ReminderList extends FunctionComponent<ReminderListProps> {}
-
-export function ReminderList(props: ReminderListProps): JSX.Element {
+export function ReminderList(props: ReminderListProps): JSX.Element | null {
+  const classes = useStyles();
   const { reminders } = props;
   const reminderItems = reminders.map((reminder) =>
     <ReminderItem reminder={reminder} key={reminder.id}/>
   );
+  if (reminders.length === 0) return null;
 
   return (
-    <div>
-      <Typography component="h3" gutterBottom>
-        {"Related reminders:"}
+    <div className={classes.reminderListWrapper}>
+      <Typography component="h3" className={classes.reminderListTitle}>
+        {"Related saved items:"}
       </Typography>
       {reminderItems}
     </div>
   );
 }
 
-interface ReminderItemProps {
-  reminder: Reminder;
-}
-
-// interface ReminderItem extends FunctionComponent<ReminderItemProps> {}
+type ReminderItemProps = { reminder: Reminder };
 
 export function ReminderItem(props: ReminderItemProps): JSX.Element {
   const classes = useStyles();
