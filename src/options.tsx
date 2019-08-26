@@ -2,14 +2,30 @@ import { chromeRuntimeSendMessage } from './chrome_helpers';
 
 const addTestDataButtonHandler = function(): void {
   chromeRuntimeSendMessage({ operation: 'addTestData' })
-    .then(() => alert('addTestData message sent!'))
-    .catch(() => alert('Error sending addTestData message.'));
+    .then((response) => {
+      if (response === 'SUCCESS') {
+        console.log(`addTestData response: ${response}`);
+      } else {
+        throw new Error(`addTestData response: ${response}`);
+      }
+    })
+    .catch((error) => {
+      console.log(`Error during communication with addTestData: ${error}`)
+    });
 };
 
 const deleteSavedDataButtonHandler = function(): void {
-  chromeRuntimeSendMessage({ operation: 'addTestData' })
-    .then(() => alert('deleteSavedData message sent!'))
-    .catch(() => alert('Error sending deleteSavedData message.'));
+  chromeRuntimeSendMessage({ operation: 'deleteSavedData' })
+    .then((response) => {
+      if (response === 'SUCCESS') {
+        console.log(`deleteSavedData response: ${response}`);
+      } else {
+        throw new Error(`deleteSavedData response: ${response}`);
+      }
+    })
+    .catch((error) => {
+      console.log(`Error during communication with deleteSavedData: ${error}`)
+    });
 };
 
 const setupEventListener = function(elemId: string,

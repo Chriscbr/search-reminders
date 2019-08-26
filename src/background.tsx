@@ -94,5 +94,9 @@ chrome.runtime.onMessage.addListener(
         });
 
     }
+
+    // indicates that we want sendResponse to support asynchronous responses;
+    // without this the message port will close too quickly
+    return true;
   }
 );

@@ -20,3 +20,12 @@ updates and retrieves user data from the
 `content_script.js`) communicate with `background.js` via
 [message passing](https://developer.chrome.com/extensions/messaging) in order
 to update or receive data.
+
+# Debugging notes
+To see what's inside Chrome local storage for the app, open the developer
+console (Ctrl + Shift + I) from the extension's background or options pages,
+and run the following snippet:
+
+```
+chrome.storage.sync.get(function(result){console.log(result)})
+```
