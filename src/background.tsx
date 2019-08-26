@@ -1,12 +1,20 @@
-import {KeywordMap, ReminderDataResponse, ReminderStore,
-  promisify} from './common';
+import { KeywordMap, ReminderDataResponse, ReminderStore,
+  ReminderParams } from './common';
+import { chromeStorageSyncSet } from './chrome_helpers';
+import rawTestData from './testData.json';
 
-const chromeStorageSyncSet = function(data: object): Promise<unknown> {
-  return promisify(chrome.storage.sync.set.bind(chrome.storage.sync), data);
-};
+const addTestData = function(testData: ReminderParams[],
+                             reminderStore: ReminderStore,
+                             keywordMap: KeywordMap): void {
+  testData.forEach((params, _index) => {
+    const reminder = reminderStore.create(params);
+    keywordMap.add(reminder);
+  });
+}
 
-const saveDataToStorage = function(reminderStore: ReminderStore,
+const saveLocalDataToStorage = function(reminderStore: ReminderStore,
                                    keywordMap: KeywordMap): Promise<unknown> {
+  console.log('Saving local data to storage, with the following reminderStore and keywordMap:');
   console.log(reminderStore);
   console.log(keywordMap);
   const userData: ReminderDataResponse = {
@@ -16,63 +24,75 @@ const saveDataToStorage = function(reminderStore: ReminderStore,
   return chromeStorageSyncSet(userData);
 }
 
+const deleteAllLocalData = function(reminderStore: ReminderStore,
+                                    keywordMap: KeywordMap): void {
+  reminderStore.clear();
+  keywordMap.clear();
+};
+
+// Initialize ReminderStore and KeywordMap
 const reminderStore = new ReminderStore();
 const keywordMap = new KeywordMap();
+const testData = Array.from(rawTestData) as ReminderParams[];
 
-const testReminderData = [
-  {
-    url: 'https://sweets.seriouseats.com/2013/12/the-food-lab-the-best-chocolate-chip-cookies.html',
-    title: 'The Science of the Best Chocolate Chip Cookies | The Food Lab | Serious Eats',
-    description: `I've never been able to get a chocolate chip cookie exactly the way I like. I'm talking chocolate cookies that are barely crisp around the edges with a buttery, toffee-like crunch that transitions into a chewy, moist center that bends like caramel, rich with butter and big pockets of melted chocolate. I made it my goal to test each and every element from ingredients to cooking process, leaving no chocolate chip unturned in my quest for the best. 32 pounds of flour, over 100 individual tests, and 1,536 cookies later, I had my answers.`,
-    keywords: ['chocolate', 'chip', 'cookies', 'cookie', 'dessert', 'bake', 'recipe']
-  },
-  {
-    url: 'https://www.delish.com/cooking/recipe-ideas/a24892347/how-to-make-a-smoothie/',
-    title: 'Best Triple Berry Smoothie - How to Make a Smoothie',
-    description: 'This is the perfect way to make a smoothie from Delish.com.',
-    keywords: ['smoothie', 'recipe', 'delicious', 'fruit']
-  }
-];
-
-testReminderData.forEach((params, _index) => {
-  const reminder = reminderStore.create(params);
-  keywordMap.add(reminder);
-});
-
-saveDataToStorage(reminderStore, keywordMap)
-  .then(() => console.log('Saved data to sync storage.'))
+// Initialize test data
+addTestData(testData, reminderStore, keywordMap);
+saveLocalDataToStorage(reminderStore, keywordMap)
+  .then(() => console.log('Test data initialized.'))
   .catch((error) => {
-    console.log(`Error occurred saving data to sync storage: ${error}`)
+    console.error(`Error occurred saving data to sync storage: ${error}`)
   });
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     console.log(sender.tab ?
-                'Received message from a content script:' + sender.tab.url :
+                `Received message from a content script: ${sender.tab.url}` :
                 'Received message from the extension.');
+    console.log(`Message operation: ${request.operation}`);
+
     if (request.operation === 'getReminderData') {
-      console.log('Sending data back to sender.');
+
       const response: ReminderDataResponse = {
         reminderStore: reminderStore.toJSON(),
         keywordMap: keywordMap.toJSON()
       };
+      console.log('Sending response to getReminderData with data:');
+      console.log(response);
       sendResponse(response);
+
     } else if (request.operation === 'addTestData') {
-      console.log('Adding test data.');
-      testReminderData.forEach((params, _index) => {
+
+      testData.forEach((params, _index) => {
         const reminder = reminderStore.create(params);
         keywordMap.add(reminder);
       });
-      saveDataToStorage(reminderStore, keywordMap)
+      saveLocalDataToStorage(reminderStore, keywordMap)
         .then(() => {
           console.log('Saved data to sync storage.');
-          sendResponse('SUCCESS'); // TODO: set up receiver
+          console.log('Sending response to addTestData: SUCCESS');
+          sendResponse('SUCCESS');
         })
         .catch((error) => {
-          console.log(`Error occurred saving data to sync storage: ${error}`);
-          sendResponse('ERROR'); // TODO: set up receiver to handle message
+          console.error(`Error occurred saving data to sync storage: ${error}`);
+          console.log('Sending response to addTestData: ERROR');
+          sendResponse('ERROR');
         });
-      // TODO: handle deleteSavedData case
+
+    } else if (request.operation === 'deleteSavedData') {
+
+      deleteAllLocalData(reminderStore, keywordMap);
+      saveLocalDataToStorage(reminderStore, keywordMap)
+        .then(() => {
+          console.log('Deleted data and updated sync storage.');
+          console.log('Sending response to deleteTestData: SUCCESS');
+          sendResponse('SUCCESS'); 
+        })
+        .catch((error) => {
+          console.error(`Error occured deleting saved data: ${error}`);
+          console.log('Sending response to deleteTestData: ERROR');
+          sendResponse('ERROR');
+        });
+
     }
   }
 );

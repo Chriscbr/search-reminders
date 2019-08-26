@@ -1,4 +1,4 @@
-interface ReminderParams {
+export interface ReminderParams {
   url: string;
   title: string;
   description: string;
@@ -90,6 +90,11 @@ export class ReminderStore {
     this.data.delete(reminder.id);
   }
 
+  clear(): void {
+    this.data.clear();
+    this.currentId = 0;
+  }
+
   toJSON(): string {
     return JSON.stringify([this.currentId,
       [...this.data].map((value: [number, Reminder]) => {
@@ -154,6 +159,10 @@ export class KeywordMap {
     });
   }
 
+  clear(): void {
+    this.data.clear();
+  }
+
   toJSON(): string {
     return JSON.stringify([...this.data].map((value: [string, Set<number>]) => {
       return [value[0], Array.from(value[1])];
@@ -173,19 +182,4 @@ export class KeywordMap {
 export type ReminderDataResponse = {
   reminderStore: string;
   keywordMap: string;
-};
-
-export const promisify = function(fn: Function, ...params: unknown[]): Promise<unknown> {
-  return new Promise((resolve, reject): void => {
-    return fn.apply(null, params.concat((result: unknown) => {
-      if (chrome.runtime.lastError) {
-        return reject(chrome.runtime.lastError);
-      }
-      return resolve(result);
-    }));
-  });
-};
-
-export const chromeRuntimeSendMessage = function(data: object): Promise<unknown> {
-  return promisify(chrome.runtime.sendMessage.bind(chrome.runtime), data);
 };

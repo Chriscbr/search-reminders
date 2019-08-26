@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.google.com/search*"],
-      "js": ["js/contentScript.js"]
+      "js": ["js/content_script.js"]
     }
   ],
   "options_page": "options.html",

@@ -1,4 +1,4 @@
-import { chromeRuntimeSendMessage } from './common';
+import { chromeRuntimeSendMessage } from './chrome_helpers';
 
 const addTestDataButtonHandler = function(): void {
   chromeRuntimeSendMessage({ operation: 'addTestData' })

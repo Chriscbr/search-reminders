@@ -1,8 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Reminder, ReminderStore, KeywordMap, chromeRuntimeSendMessage,
+import {Reminder, ReminderStore, KeywordMap,
   ReminderDataResponse} from './common';
 import {ReminderList} from './ui_components';
+import { chromeRuntimeSendMessage } from './chrome_helpers';
 
 const getSearchQuery = function(): string {
   const urlParams = new URLSearchParams(document.location.search.substring(1));

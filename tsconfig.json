@@ -12,6 +12,8 @@
         "sourceMap": false,
         "jsx": "react",
         "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "rootDir": "src",
         "outDir": "dist/js",
         "noEmitOnError": true,
