@@ -42,24 +42,57 @@ want to test changes, by clicking on the refresh button on
 future uses
 - Add unit tests
 - Refactor content_script.js
-- Add JSON serialization using different library (e.g. classValidator)
+- ~~Add JSON serialization using different library (e.g. classValidator)~~
+  - I don't think there are any good serialization libraries that are
+  lightweight and support the kind of nested data structures I'd like. 
+  - "serialize-javascript" supports serializing almost anything, but it
+  unnecessarily includes method information, and to deserialize you have to use
+  eval, which is necessarily dangeorus.
+  - "class-transformer" provides a very nice syntax, but it created huge bundles
+  (possibly avoidable with more research - not sure), and it did not support
+  complex structures like `Map<K, Set<V>>` natively.
 - Add feature: on any webpage, click extension and click button to creating a
 reminder based on it
-- Add local build / deployment instructions
 - Add ability on options page to see list of saved pages
 - Handle duplicate webpages (create another hashmap?) / prevent duplicates from
 occurring in the reminder store
 - Add animation for when reminder list loads onto page
 - Support different search engines, like DuckDuckGo
+- Read about Redux, and evaluate if it would be useful for this project
 - Update extension icons
 
 # Project structure
 
-TODO
+```
+├── README.md               - This file you are reading.
+├── dist                    - The build output, which can be loaded into Chrome
+├── node_modules            - Stores dependency code during development
+├── package-lock.json       - Dependency metadata
+├── package.json            - General metadata and dependency list
+├── public                  - Non-JS assets used by the extension
+│   ├── images              - Icons and such
+│   ├── manifest.json       - Chrome extension metadata information
+│   ├── options.html        - HTML layout for options page
+│   └── popup.html          - HTML layout for popup
+├── src                     - Source code
+│   ├── background.tsx      - Code that runs in the background and stores data
+│   ├── chrome_helpers.tsx  - Wrapper functions for Chrome APIs
+│   ├── common.tsx          - Code that is shared between modules
+│   ├── content_script.tsx  - Code that gets injected to google.com/search
+│   ├── options.tsx         - Code that runs on the options page
+│   ├── popup.tsx           - Code that runs on the popup
+│   ├── testData.json       - Test data
+│   └── ui_components.tsx   - React components
+├── tsconfig.json           - Settings for compiling TypeScript to JavaScript
+└── webpack                 - Settings for bundling all files into an extension
+    ├── webpack.common.js   - General bundling settings
+    ├── webpack.dev.js      - Bundling settings for "watch" script
+    └── webpack.prod.js     - Bundling settings for "build" script
+```
 
 # Data flow
-- `background.js` is the "master" process, in the sense that it is the only script that
-updates and retrieves user data from the
+- `background.js` is the "master" process, in the sense that it is the only
+script that updates and retrieves user data from the
 [Chrome Sync Storage Area](https://developer.chrome.com/extensions/storage).
 - All other pages (`popup.html`, `options.html`, and the injected script
 `content_script.js`) communicate with `background.js` via
