@@ -1,19 +1,21 @@
 import * as React from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import Settings from '@material-ui/icons/Settings';
+import Divider from '@material-ui/core/Divider';
+import Typography from '@material-ui/core/Typography';
+import PopupContent from './PopupContent';
+import PopupNavbar from './PopupNavbar';
 
 const useStyles = makeStyles({
   box: {
-    width: '300px'
+    width: '300px',
   },
-  grow: {
-    flexGrow: 1
+  title: {
+    fontSize: '1.25rem',
   },
-  extendedIcon: {
-    marginRight: '5px',
+  divider: {
+    marginTop: '10px',
+    marginBottom: '10px',
   },
 });
 
@@ -21,23 +23,10 @@ export const PopupView = function(): JSX.Element {
   const classes = useStyles();
   return (
     <Box className={classes.box}>
-      <p>Hello world!</p>
-      <form>
-        
-      </form>
-      <Grid container>
-        <Grid item className={classes.grow} />
-        <Grid item>
-          <Button
-              size="small"
-              aria-label="open"
-              onClick={(): void => chrome.runtime.openOptionsPage()}
-            >
-            <Settings className={classes.extendedIcon} fontSize="small" />
-            Settings
-          </Button>
-        </Grid>
-      </Grid>
+      <Typography className={classes.title}>Search Reminders</Typography>
+      <Divider variant="middle" className={classes.divider} />
+      <PopupContent />
+      <PopupNavbar />
     </Box>
   );
 }

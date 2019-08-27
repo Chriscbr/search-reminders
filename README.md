@@ -53,6 +53,8 @@ future uses
   complex structures like `Map<K, Set<V>>` natively.
 - Add feature: on any webpage, click extension and click button to creating a
 reminder based on it
+  - Make saved item descriptions editable
+  - Allow users to add search keywords
 - Add ability on options page to see list of saved pages
 - Handle duplicate webpages (create another hashmap?) / prevent duplicates from
 occurring in the reminder store
