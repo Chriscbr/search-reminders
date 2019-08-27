@@ -1,6 +1,3 @@
-import { deserialize, serialize, Type } from 'class-transformer';
-import 'reflect-metadata';
-
 export interface ReminderParams {
   url: string;
   title: string;
@@ -13,38 +10,19 @@ export class Reminder {
   url: string;
   title: string;
   description: string;
-
-  @Type(() => String)
   keywords: string[];
 
-  /**
-   * Use Reminder.from() to initialize, in order to guarantee parameter
-   * validation occurs.
-   */
-  constructor(id: number,
-              url: string,
-              title: string,
-              description: string,
-              keywords: string[]) {
+  constructor(id: number, url: string, title: string, description: string, keywords: string[]) {
     this.id = id;
     this.url = url;
     this.title = title;
     this.description = description;
     this.keywords = keywords;
-  }
-
-  from(id: number,
-       url: string,
-       title: string,
-       description: string,
-       keywords: string[]): Reminder {
-    const reminder = new Reminder(id, url, title, description, keywords);
-    reminder.validateParams();
-    return reminder;
+    this.validateParams();
   }
 
   private validateParams(): void {
-    if (this.keywords === undefined || this.keywords.length < 0) {
+    if (this.keywords === null || this.keywords.length < 0) {
       throw new Error('Reminder must have an array of more than 0 keywords.');
     }
     if (new Set(this.keywords).size !== this.keywords.length) {
@@ -53,16 +31,34 @@ export class Reminder {
   }
 
   toJSON(): string {
-    return serialize(this);
+    return JSON.stringify({
+      id: this.id,
+      url: this.url,
+      title: this.title,
+      description: this.description,
+      keywords: this.keywords
+    });
   }
 
   static fromJSON(jsonStr: string): Reminder {
-    return deserialize(Reminder, jsonStr);
+    const json: {
+      id: number;
+      url: string;
+      title: string;
+      description: string;
+      keywords: string[];
+    } = JSON.parse(jsonStr);
+    return new Reminder(
+      json.id,
+      json.url,
+      json.title,
+      json.description,
+      json.keywords,
+    );
   }
 
   toString(): string {
-    return `Reminder(${this.id}, ${this.url}, ${this.title}, ` +
-      `${this.description}, [${this.keywords}])`;
+    return `Reminder(${this.id}, ${this.url}, ${this.title}, ${this.description}, [${this.keywords}])`;
   }
 }
 
@@ -70,10 +66,7 @@ export class Reminder {
  * Map from random IDs to Reminder objects.
  */
 export class ReminderStore {
-
-  @Type(() => Reminder)
-  data: Map<string, Reminder>;
-
+  data: Map<number, Reminder>;
   currentId: number;
 
   constructor() {
@@ -86,17 +79,16 @@ export class ReminderStore {
     const reminder = new Reminder(
       this.currentId, url, title, description, keywords);
     reminder.id = this.currentId;
-    this.data.set(this.currentId.toString(), reminder);
-    this.currentId++;
+    this.data.set(this.currentId++, reminder);
     return reminder;
   }
 
   remove(reminderId: number): Reminder {
-    const reminder = this.data.get(reminderId.toString());
+    const reminder = this.data.get(reminderId);
     if (reminder === undefined) {
       throw new Error(`Invalid reminderId: ${reminderId}`);
     } else {
-      this.data.delete(reminderId.toString());
+      this.data.delete(reminderId);
       return reminder;
     }
   }
@@ -107,11 +99,23 @@ export class ReminderStore {
   }
 
   toJSON(): string {
-    return serialize(this);
+    return JSON.stringify([this.currentId,
+      [...this.data].map((value: [number, Reminder]) => {
+        return [value[0], value[1].toJSON()];
+    })]);
   }
 
   static fromJSON(jsonStr: string): ReminderStore {
-    return deserialize(ReminderStore, jsonStr);
+    const json: [
+      number,
+      [number, string][]
+    ] = JSON.parse(jsonStr);
+    const reminderStore = new ReminderStore();
+    reminderStore.currentId = json[0];
+    reminderStore.data = new Map(json[1].map(pair => {
+      return [pair[0], Reminder.fromJSON(pair[1])];
+    }));
+    return reminderStore;
   }
 } 
 
@@ -119,11 +123,6 @@ export class ReminderStore {
  * Map from keywords to Reminder IDs.
  */
 export class KeywordMap {
-
-  // even though this annotation doesn't seem to work correctly (the entries
-  // after deserializing are still arrays, not sets), if we don't include
-  // this annotation then it won't even be deserialized into a proper map
-  @Type(() => Set)
   data: Map<string, Set<number>>
 
   constructor() {
@@ -168,18 +167,18 @@ export class KeywordMap {
   }
 
   toJSON(): string {
-    return serialize(this);
+    return JSON.stringify([...this.data].map((value: [string, Set<number>]) => {
+      return [value[0], Array.from(value[1])];
+    }));
   }
 
   static fromJSON(jsonStr: string): KeywordMap {
-    const keyboardMap = deserialize(KeywordMap, jsonStr);
-
-    // the class-transformer package providing the serialization functions is
-    // a bit limited, so we are manually converting entries into sets ourselves
-    keyboardMap.data.forEach((values, key, map): void => {
-      map.set(key, new Set(values));
-    })
-    return keyboardMap;
+    const json: [string, number[]][] = JSON.parse(jsonStr);
+    const keywordMap = new KeywordMap();
+    keywordMap.data = new Map(json.map((value: [string, number[]]) => {
+      return [value[0], new Set(value[1])];
+    }));
+    return keywordMap;
   }
 }
 

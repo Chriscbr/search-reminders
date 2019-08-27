@@ -62,7 +62,7 @@ requestReminderData().then(data => {
   console.log(`${reminderIds.size} relevant reminders found.`);
   const reminderList: Reminder[] = [];
   reminderIds.forEach(id => {
-    const reminder = reminderStore.data.get(id.toString());
+    const reminder = reminderStore.data.get(id);
     if (reminder === undefined) {
       throw new Error(`Reminder not found in reminderMap for id: ${id}`);
     }
