@@ -182,6 +182,7 @@ export class KeywordMap {
   }
 }
 
+// TODO: rename this variable?
 export type ReminderDataResponse = {
   reminderStore: string;
   keywordMap: string;

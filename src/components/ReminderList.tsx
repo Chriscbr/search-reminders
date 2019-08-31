@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Reminder } from "../common";
 import ReminderItem from './ReminderItem';
-import makeStyles from "@material-ui/core/styles/makeStyles";
+import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
+import makeStyles from "@material-ui/core/styles/makeStyles";
 
 const useStyles = makeStyles({
   reminderListWrapper: {
@@ -31,12 +32,12 @@ export const ReminderList = function(props: ReminderListProps): JSX.Element {
   );
 
   return (
-    <div className={classes.reminderListWrapper}>
+    <Box className={classes.reminderListWrapper}>
       <Typography component="h3" className={classes.reminderListTitle}>
         {"Related saved items:"}
       </Typography>
       {reminderItems}
-    </div>
+    </Box>
   );
 };
 

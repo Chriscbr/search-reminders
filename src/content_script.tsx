@@ -2,11 +2,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Reminder, ReminderStore, KeywordMap,
   ReminderDataResponse } from './common';
-import { ReminderApp } from './ui_components';
+import ReminderApp from './components/ReminderApp';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
 
-// gets search query from the URL, e.g. google.com/search?q=fresh%23cookies
-const getSearchQuery = function(): string {
+/**
+ * Get the search query from the URL of the page.
+ * e.g. google.com/search?q=fresh%23cookies
+ * */
+const getSearchQuery = function(document: Document): string {
   const urlParams = new URLSearchParams(document.location.search.substring(1));
   const query = urlParams.get('q');
   if (!query) {
@@ -42,7 +45,7 @@ requestReminderData().then(data => {
   const reminderStore = ReminderStore.fromJSON(data.reminderStore);
   const keywordMap = KeywordMap.fromJSON(data.keywordMap);
 
-  const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
+  const keywords: string[] = getKeywordsFromQuery(getSearchQuery(document));
   console.log(`Keywords found: ${keywords}`);
 
   // Set, not a list, in order to avoid duplicate reminder IDs
