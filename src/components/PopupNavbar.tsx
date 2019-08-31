@@ -3,8 +3,20 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Settings from '@material-ui/icons/Settings';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles({
+  container: {
+    position: 'relative',
+  },
+  version: {
+    color: '#555555',
+    fontSize: '0.8rem',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    minWidth: 'max-content',
+  },
   grow: {
     flexGrow: 1
   },
@@ -13,10 +25,19 @@ const useStyles = makeStyles({
   },
 });
 
+/*
+ * Note: even though most "navbars" appear at the top or side of a webpage,
+ * this one appears at the bottom of the popup.
+ */
 export const PopupNavbar = function(): JSX.Element {
   const classes = useStyles();
   return (
-    <Grid container>
+    <Grid container className={classes.container}>
+      <Grid item>
+        <Typography component="p" className={classes.version}>
+          Version: 0.0.1
+        </Typography>
+      </Grid>
       <Grid item className={classes.grow} />
       <Grid item>
         <Button
