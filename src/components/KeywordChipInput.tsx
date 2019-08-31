@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import ChipInput from 'material-ui-chip-input';
 import Chip from '@material-ui/core/Chip';

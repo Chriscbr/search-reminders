@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Reminder } from "../common";
 import ReminderItem from './ReminderItem';
 import Box from '@material-ui/core/Box';

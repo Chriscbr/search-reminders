@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useState } from 'react';
 import { Reminder } from '../common';
 import { chromeRuntimeSendMessage } from '../chrome_helpers';

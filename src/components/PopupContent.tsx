@@ -1,13 +1,14 @@
-import * as React from 'react';
+import React from 'react';
 import { useState } from 'react';
+import KeywordChipInput from './KeywordChipInput';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Box from '@material-ui/core/Box';
+import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import KeywordChipInput from './KeywordChipInput';
 
 const useStyles = makeStyles({
   box: {
-    padding: '10px 5px 10px 5px',
+    padding: '0px 5px 10px 5px',
   },
   pageTitle: {
     fontSize: '1.1rem',
@@ -26,6 +27,10 @@ const useStyles = makeStyles({
     WebkitLineClamp: 3,
     display: '-webkit-box',
     marginBottom: '15px',
+  },
+  descriptionTextField: {
+    marginTop: '10px',
+    marginBottom: '10px',
   },
   chip: {
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
@@ -57,17 +62,30 @@ const renderEditingMode = function(
     title: string,
     description: string,
     keywords: string[],
+    handleChangeTitle: (event: React.ChangeEvent<HTMLInputElement>) => void,
+    handleChangeDescription: (event: React.ChangeEvent<HTMLInputElement>) => void,
     handleAddKeyword: (keyword: string) => void,
     handleDeleteKeyword: (deletedKeyword: string, index: number) => void,
     classes: Record<string, string>): JSX.Element {
   return (
     <Box className={classes.box}>
-      <Typography className={classes.pageTitle}>
-        {title}
-      </Typography>
-      <Typography component="p" className={classes.pageDescription}>
-        {description}
-      </Typography>
+      <TextField
+        label="Title"
+        value={title}
+        onChange={handleChangeTitle}
+        variant="filled"
+        fullWidth
+      />
+      <TextField
+        label="Description"
+        value={description}
+        onChange={handleChangeDescription}
+        variant="filled"
+        className={classes.descriptionTextField}
+        multiline
+        rows="4"
+        fullWidth
+      />
       <KeywordChipInput
         keywords={keywords}
         handleAddKeyword={handleAddKeyword}
@@ -102,6 +120,14 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const [keywords, setKeywords] = useState(initKeywords);
   const classes = useStyles();
 
+  const handleChangeTitle = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    setTitle(event.target.value);
+  };
+
+  const handleChangeDescription = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    setDescription(event.target.value);
+  };
+
   const handleAddKeyword = (keyword: string): void => {
     setKeywords([...keywords, keyword]);
   };
@@ -114,8 +140,8 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     case 'empty':
       return renderEmptyMode();
     case 'editing':
-      return renderEditingMode(title, description, keywords, handleAddKeyword,
-                               handleDeleteKeyword, classes);
+      return renderEditingMode(title, description, keywords, handleChangeTitle,
+        handleChangeDescription, handleAddKeyword, handleDeleteKeyword, classes);
     case 'saved':
       return renderSavedMode(title, description, keywords, classes);
     default:
