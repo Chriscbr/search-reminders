@@ -25,10 +25,15 @@ export const PopupView = function(): JSX.Element {
     <Box className={classes.box}>
       <Typography className={classes.title}>Search Reminders</Typography>
       <Divider variant="middle" className={classes.divider} />
-      <PopupContent mode="editing" />
+      <PopupContent
+        initTitle="The Science of the Best Chocolate Chip Cookies | The Food Lab | Serious Eats"
+        initDescription={`I've never been able to get a chocolate chip cookie exactly the way I like. I'm talking chocolate cookies that are barely crisp around the edges with a buttery, toffee-like crunch that transitions into a chewy, moist center that bends like caramel, rich with butter and big pockets of melted chocolate. I made it my goal to test each and every element from ingredients to cooking process, leaving no chocolate chip unturned in my quest for the best. 32 pounds of flour, over 100 individual tests, and 1,536 cookies later, I had my answers.`}
+        initKeywords={['cookie', 'recipe']}
+        mode="editing"
+      />
       <PopupNavbar />
     </Box>
   );
-}
+};
 
 export default PopupView;

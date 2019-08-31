@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useState } from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import ChipInput from 'material-ui-chip-input';
 import Chip from '@material-ui/core/Chip';
@@ -11,36 +10,29 @@ const useStyles = makeStyles({
 });
 
 type KeywordChipInputProps = {
-  initKeywords: string[];
+  keywords: string[];
   disabled?: boolean;
+  handleAddKeyword?: (keyword: string) => void;
+  handleDeleteKeyword?: (deletedKeyword: string, index: number) => void;
 }
 
 export const KeywordChipInput = function(props: KeywordChipInputProps): JSX.Element {
-  const [keywords, setKeywords] = useState(props.initKeywords);
+  const { keywords, disabled, handleAddKeyword, handleDeleteKeyword } = props;
   const classes = useStyles();
-
-  const handleAddKeyword = (keyword: string): void => {
-    setKeywords([...keywords, keyword])
-  };
-
-  const handleDeleteKeyword = (deletedKeyword: string, _index: number): void => {
-    setKeywords(keywords.filter((keyword) => keyword !== deletedKeyword));
-  }
 
   return (
     <ChipInput
       value={keywords}
-      onAdd={(keyword): void => handleAddKeyword(keyword)}
-      onDelete={(keyword, index): void => handleDeleteKeyword(keyword, index)}
+      onAdd={handleAddKeyword}
+      onDelete={handleDeleteKeyword}
       variant='filled'
       label='Keywords'
-      disabled={props.disabled}
+      disabled={disabled}
       classes={{ chip: classes.chip }}
       fullWidth
       chipRenderer={(
         {
           value,
-          handleClick,
           handleDelete,
           className
         },
@@ -50,8 +42,7 @@ export const KeywordChipInput = function(props: KeywordChipInputProps): JSX.Elem
           key={key}
           className={className}
           size='small'
-          onClick={handleClick}
-          onDelete={handleDelete}
+          onDelete={disabled ? undefined : handleDelete}
           label={value}
         />
       )}
@@ -61,6 +52,8 @@ export const KeywordChipInput = function(props: KeywordChipInputProps): JSX.Elem
 
 KeywordChipInput.defaultProps = {
   disabled: false,
+  // handleAddKeyword and handleDeleteKeyword will be left as undefined
+  // if they are not provided as parameters
 };
 
 export default KeywordChipInput;

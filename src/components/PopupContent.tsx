@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
@@ -42,6 +43,9 @@ const useStyles = makeStyles({
 type PopupContentMode = 'empty' | 'editing' | 'saved';
 
 type PopupContentProps = {
+  initTitle: string;
+  initDescription: string;
+  initKeywords: string[];
   mode: PopupContentMode;
 };
 
@@ -49,45 +53,71 @@ const renderEmptyMode = function(): JSX.Element {
   return <Box></Box>;
 };
 
-const renderEditingMode = function(classes: Record<string, string>): JSX.Element {
+const renderEditingMode = function(
+    title: string,
+    description: string,
+    keywords: string[],
+    handleAddKeyword: (keyword: string) => void,
+    handleDeleteKeyword: (deletedKeyword: string, index: number) => void,
+    classes: Record<string, string>): JSX.Element {
   return (
     <Box className={classes.box}>
       <Typography className={classes.pageTitle}>
-        The Science of the Best Chocolate Chip Cookies | The Food Lab | Serious Eats
+        {title}
       </Typography>
       <Typography component="p" className={classes.pageDescription}>
-        {`I've never been able to get a chocolate chip cookie exactly the way I like. I'm talking chocolate cookies that are barely crisp around the edges with a buttery, toffee-like crunch that transitions into a chewy, moist center that bends like caramel, rich with butter and big pockets of melted chocolate. I made it my goal to test each and every element from ingredients to cooking process, leaving no chocolate chip unturned in my quest for the best. 32 pounds of flour, over 100 individual tests, and 1,536 cookies later, I had my answers.`}
+        {description}
       </Typography>
-      <KeywordChipInput initKeywords={['cookie', 'recipe']} />
+      <KeywordChipInput
+        keywords={keywords}
+        handleAddKeyword={handleAddKeyword}
+        handleDeleteKeyword={handleDeleteKeyword}
+      />
     </Box>
   );
 };
 
-const renderSavedMode = function(classes: Record<string, string>): JSX.Element {
+const renderSavedMode = function(
+    title: string,
+    description: string,
+    keywords: string[],
+    classes: Record<string, string>): JSX.Element {
   return (
     <Box className={classes.box}>
       <Typography className={classes.pageTitle}>
-        The Science of the Best Chocolate Chip Cookies | The Food Lab | Serious Eats
+        {title}
       </Typography>
       <Typography component="p" className={classes.pageDescription}>
-        {`I've never been able to get a chocolate chip cookie exactly the way I like. I'm talking chocolate cookies that are barely crisp around the edges with a buttery, toffee-like crunch that transitions into a chewy, moist center that bends like caramel, rich with butter and big pockets of melted chocolate. I made it my goal to test each and every element from ingredients to cooking process, leaving no chocolate chip unturned in my quest for the best. 32 pounds of flour, over 100 individual tests, and 1,536 cookies later, I had my answers.`}
+        {description}
       </Typography>
-      <KeywordChipInput initKeywords={['cookie', 'recipe']} disabled={true} />
+      <KeywordChipInput keywords={keywords} disabled={true} />
     </Box>
   );
 };
 
 export const PopupContent = function(props: PopupContentProps): JSX.Element {
+  const { initTitle, initDescription, initKeywords, mode } = props;
+  const [title, setTitle] = useState(initTitle);
+  const [description, setDescription] = useState(initDescription);
+  const [keywords, setKeywords] = useState(initKeywords);
   const classes = useStyles();
-  const { mode } = props;
+
+  const handleAddKeyword = (keyword: string): void => {
+    setKeywords([...keywords, keyword]);
+  };
+
+  const handleDeleteKeyword = (deletedKeyword: string, _index: number): void => {
+    setKeywords(keywords.filter((keyword) => keyword !== deletedKeyword));
+  };
 
   switch (mode) {
     case 'empty':
       return renderEmptyMode();
     case 'editing':
-      return renderEditingMode(classes);
+      return renderEditingMode(title, description, keywords, handleAddKeyword,
+                               handleDeleteKeyword, classes);
     case 'saved':
-      return renderSavedMode(classes);
+      return renderSavedMode(title, description, keywords, classes);
     default:
       console.error(`Mode '${mode}' not recognized, defaulting to 'empty'.`);
       return renderEmptyMode();
