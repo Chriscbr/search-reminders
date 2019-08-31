@@ -25,7 +25,7 @@ export const PopupView = function(): JSX.Element {
     <Box className={classes.box}>
       <Typography className={classes.title}>Search Reminders</Typography>
       <Divider variant="middle" className={classes.divider} />
-      <PopupContent />
+      <PopupContent mode="editing" />
       <PopupNavbar />
     </Box>
   );
