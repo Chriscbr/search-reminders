@@ -63,7 +63,30 @@ export class Reminder {
 }
 
 /**
- * Map from random IDs to Reminder objects.
+ * Map from URLs to Reminder IDs.
+ * 
+ * This class is primarily used as a utility and does not contain unique
+ * information not stored in the KeywordMap or ReminderStore, so it does not
+ * need to be saved into local storage.
+ */
+export class ReminderURLMap {
+  data: Map<string, number>;
+
+  constructor(reminderList: Reminder[]) {
+    this.data = this.initData(reminderList);
+  }
+
+  initData(reminderList: Reminder[]): Map<string, number> {
+    const data = new Map();
+    reminderList.forEach((reminder: Reminder): void => {
+      data.set(reminder.url, reminder.id);
+    });
+    return data;
+  } 
+}
+
+/**
+ * Map from reminder IDs to Reminder objects.
  */
 export class ReminderStore {
   data: Map<number, Reminder>;

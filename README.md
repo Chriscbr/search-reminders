@@ -38,6 +38,14 @@ want to test changes, by clicking on the refresh button on
 
 
 # TODOs
+- Refactor data flow to minimize computation / complexity of transferring the
+ReminderStore, KeywordMap, and/or the ReminderURLMap/Helper with serialization
+  - Store all data in chrome local storage as just a list of reminders, which
+  can then be processed into the necessary fast data structures when the
+  extension's background page is loaded
+  - content_script and popup can both get the data they need just by
+  message passing with the background process
+- Improve logging...?
 - Rename things from "reminders" to "saved items" to generalize potential
 future uses
 - Add unit tests

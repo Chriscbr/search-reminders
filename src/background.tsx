@@ -1,5 +1,10 @@
-import { KeywordMap, ReminderDataResponse, ReminderStore,
-  ReminderParams } from './common';
+import {
+  KeywordMap,
+  ReminderDataResponse,
+  ReminderStore,
+  ReminderParams,
+  ReminderURLMap
+} from './common';
 import { chromeStorageSyncSet, chromeStorageSyncGet } from './chrome_helpers';
 import rawTestData from './testData.json';
 
@@ -56,8 +61,13 @@ const deleteAllLocalData = function(reminderStore: ReminderStore,
 
 const addMessageListener = function(reminderStore: ReminderStore,
                                     keywordMap: KeywordMap,
+                                    reminderURLMap: ReminderURLMap,
                                     testData: ReminderParams[]): void {
   chrome.runtime.onMessage.addListener(
+  
+    // TODO: should really assign a type to "request" to document what fields
+    // it could contain depending on the query...
+    // for some reason TypeScript doesn't seem to care
     function(request, sender, sendResponse) {
       console.log(sender.tab ?
                   `Received message from a content script: ${sender.tab.url}` :
@@ -119,6 +129,23 @@ const addMessageListener = function(reminderStore: ReminderStore,
             sendResponse('ERROR');
           });
 
+      } else if (request.operation === 'getReminderFromURL') {
+
+        const reminderId = reminderURLMap.data.get(request.url);
+        if (reminderId === undefined) {
+          console.log('No reminder found for the current URL. Sending "null".');
+          sendResponse('null');
+        } else {
+          const reminder = reminderStore.data.get(reminderId);
+          if (reminder === null) {
+            console.error('Unexpected: reminderID found for URL, but Reminder data not found. Sending "null".');
+            sendResponse('null');
+          } else {
+            console.log(`ReminderID found for URL ${request.url}. Sending reminder.`);
+            sendResponse(reminder);
+          }
+        }
+
       }
 
       // indicates that we want sendResponse to support asynchronous responses;
@@ -132,5 +159,7 @@ const addMessageListener = function(reminderStore: ReminderStore,
 loadDataFromStorage().then(data => {
   const testData = Array.from(rawTestData) as ReminderParams[];
   const { reminderStore, keywordMap } = data;
-  addMessageListener(reminderStore, keywordMap, testData);
+  // Map<string (url), number (id)>
+  const reminderURLMap = new ReminderURLMap([...reminderStore.data.values()]);
+  addMessageListener(reminderStore, keywordMap, reminderURLMap, testData);
 });

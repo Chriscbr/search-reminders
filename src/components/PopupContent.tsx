@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import { Reminder } from '../common';
 
 const useStyles = makeStyles({
   box: {
@@ -57,6 +58,7 @@ type PopupContentProps = {
   initDescription: string;
   initKeywords: string[];
   initMode: PopupContentMode;
+  getReminderFromURL: () => Promise<Reminder | null>;
 };
 
 const renderEmptyMode = function(): JSX.Element {
