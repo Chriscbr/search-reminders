@@ -11,7 +11,7 @@ $ npm --version
 Clone this project, and then install all needed packages from the root directory of this project: 
 ```
 $ git clone https://github.com/Chriscbr/search-reminders.git
-$ npm run install
+$ npm install
 ```
 
 If there are any build issues, consider trying to emulate the builds made using

@@ -7,7 +7,6 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { Reminder } from '../common';
 
 const useStyles = makeStyles({
   box: {
@@ -54,15 +53,18 @@ const useStyles = makeStyles({
 type PopupContentMode = 'empty' | 'editing' | 'saved';
 
 type PopupContentProps = {
-  initTitle: string;
-  initDescription: string;
-  initKeywords: string[];
+  initTitle?: string;
+  initDescription?: string;
+  initKeywords?: string[];
   initMode: PopupContentMode;
-  getReminderFromURL: () => Promise<Reminder | null>;
 };
 
 const renderEmptyMode = function(): JSX.Element {
-  return <Box></Box>;
+  return (
+    <Box>
+      <Typography component="p">This page is not saved.</Typography>
+    </Box>
+  );
 };
 
 const renderEditingMode = function(
@@ -163,11 +165,19 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   };
 
   const handleAddKeyword = (keyword: string): void => {
-    setKeywords([...keywords, keyword]);
+    if (keywords === undefined) {
+      console.error('Unable to add keyword, keywords is undefined.');
+    } else {
+      setKeywords([...keywords, keyword]);
+    }
   };
 
   const handleDeleteKeyword = (deletedKeyword: string, _index: number): void => {
-    setKeywords(keywords.filter((keyword) => keyword !== deletedKeyword));
+    if (keywords === undefined) {
+      console.error('Unable to delete keyword, keywords is undefined.');
+    } else {
+      setKeywords(keywords.filter((keyword) => keyword !== deletedKeyword));
+    }
   };
 
   const handleSaveButton = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
@@ -184,11 +194,21 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     case 'empty':
       return renderEmptyMode();
     case 'editing':
-      return renderEditingMode(title, description, keywords, handleChangeTitle,
-        handleChangeDescription, handleAddKeyword, handleDeleteKeyword,
-        handleSaveButton, handleExitButton, classes);
+      if (title === undefined || description === undefined || keywords === undefined) {
+        console.error('Error: one or more of title, description, and keywords are undefined.');
+        return <Typography component="p">An error has occurred.</Typography>;
+      } else {
+        return renderEditingMode(title, description, keywords, handleChangeTitle,
+          handleChangeDescription, handleAddKeyword, handleDeleteKeyword,
+          handleSaveButton, handleExitButton, classes);
+      }
     case 'saved':
-      return renderSavedMode(title, description, keywords, classes);
+      if (title === undefined || description === undefined || keywords === undefined) {
+        console.error('Error: one or more of title, description, and keywords are undefined.');
+        return <Typography component="p">An error has occurred.</Typography>;
+      } else {
+        return renderSavedMode(title, description, keywords, classes);
+      }
     default:
       console.error(`Mode '${mode}' not recognized, defaulting to 'empty'.`);
       return renderEmptyMode();

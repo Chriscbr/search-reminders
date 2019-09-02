@@ -26,10 +26,12 @@ const loadDataFromStorage = function(): Promise<{ reminderStore: ReminderStore;
 
 const addTestData = function(testData: ReminderParams[],
                              reminderStore: ReminderStore,
-                             keywordMap: KeywordMap): void {
+                             keywordMap: KeywordMap,
+                             reminderURLMap: ReminderURLMap): void {
   testData.forEach((params, _index) => {
     const reminder = reminderStore.create(params);
     keywordMap.add(reminder);
+    reminderURLMap.data.set(reminder.url, reminder.id);
   });
 }
 
@@ -86,7 +88,7 @@ const addMessageListener = function(reminderStore: ReminderStore,
 
       } else if (request.operation === 'addTestData') {
 
-        addTestData(testData, reminderStore, keywordMap);
+        addTestData(testData, reminderStore, keywordMap, reminderURLMap);
         saveLocalDataToStorage(reminderStore, keywordMap)
           .then(() => {
             console.log('Saved data to sync storage.');
@@ -131,9 +133,10 @@ const addMessageListener = function(reminderStore: ReminderStore,
 
       } else if (request.operation === 'getReminderFromURL') {
 
+        console.log(reminderURLMap);
         const reminderId = reminderURLMap.data.get(request.url);
         if (reminderId === undefined) {
-          console.log('No reminder found for the current URL. Sending "null".');
+          console.log(`No reminder found for the URL ${request.url}. Sending "null".`);
           sendResponse('null');
         } else {
           const reminder = reminderStore.data.get(reminderId);
