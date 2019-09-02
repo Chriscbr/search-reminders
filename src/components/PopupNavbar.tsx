@@ -7,14 +7,15 @@ import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles({
   container: {
+    padding: '10px',
     position: 'relative',
   },
   version: {
     color: '#555555',
     fontSize: '0.8rem',
     position: 'absolute',
-    bottom: 0,
-    left: 0,
+    bottom: '10px',
+    left: '10px',
     minWidth: 'max-content',
   },
   grow: {

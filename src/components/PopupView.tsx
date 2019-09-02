@@ -12,12 +12,11 @@ const useStyles = makeStyles({
   box: {
     width: '300px',
   },
+  titleBox: {
+    padding: '10px'
+  },
   title: {
     fontSize: '1.25rem',
-  },
-  divider: {
-    marginTop: '10px',
-    marginBottom: '10px',
   },
 });
 
@@ -31,8 +30,10 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
 
   return (
     <Box className={classes.box}>
-      <Typography className={classes.title}>Search Reminders</Typography>
-      <Divider variant="middle" className={classes.divider} />
+      <Box className={classes.titleBox}>
+        <Typography className={classes.title}>Search Reminders</Typography>
+      </Box>
+      <Divider variant="fullWidth" />
       <Async promiseFn={getCurrentPageReminder}>
         <Async.Loading>
           <Typography component="p">Loading...</Typography>
@@ -60,6 +61,7 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
           }}
         </Async.Rejected>
       </Async>
+      <Divider variant="fullWidth" />
       <PopupNavbar />
     </Box>
   );

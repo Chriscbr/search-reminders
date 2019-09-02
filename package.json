@@ -24,15 +24,19 @@
     "material-ui-chip-input": "^2.0.0-beta.1",
     "react": "^16.9.0",
     "react-async": "^8.0.0",
-    "react-dom": "^16.9.0"
+    "react-dom": "^16.9.0",
+    "typeface-roboto": "0.0.75"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "copy-webpack-plugin": "^5.0.3",
+    "css-loader": "^3.2.0",
     "eslint": "^6.2.2",
     "eslint-plugin-react": "^7.14.3",
+    "file-loader": "^4.2.0",
     "rimraf": "^3.0.0",
+    "style-loader": "^1.0.0",
     "ts-loader": "^6.0.4",
     "typescript": "~3.5.3",
     "webpack": "~4.39.2",

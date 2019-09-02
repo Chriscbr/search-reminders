@@ -9,8 +9,8 @@ import { chromeRuntimeSendMessage } from './chrome_helpers';
  * Get the search query from the URL of the page.
  * e.g. google.com/search?q=fresh%23cookies
  * */
-const getSearchQuery = function(document: Document): string {
-  const urlParams = new URLSearchParams(document.location.search.substring(1));
+const getSearchQuery = function(): string {
+  const urlParams = new URLSearchParams(document.location.search.substring(1).toLocaleLowerCase());
   const query = urlParams.get('q');
   if (!query) {
     throw new Error('No search query found.');
@@ -45,7 +45,7 @@ requestReminderData().then(data => {
   const reminderStore = ReminderStore.fromJSON(data.reminderStore);
   const keywordMap = KeywordMap.fromJSON(data.keywordMap);
 
-  const keywords: string[] = getKeywordsFromQuery(getSearchQuery(document));
+  const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
   console.log(`Keywords found: ${keywords}`);
 
   // Set, not a list, in order to avoid duplicate reminder IDs

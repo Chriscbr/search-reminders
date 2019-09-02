@@ -10,7 +10,13 @@ import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles({
   box: {
-    padding: '0px 5px 10px 5px',
+    padding: '10px',
+  },
+  boxMiddle: {
+    padding: '10px 10px 0 10px',
+  },
+  buttonSpacing: {
+    padding: '5px',
   },
   pageTitle: {
     fontSize: '1.1rem',
@@ -59,9 +65,9 @@ type PopupContentProps = {
   initMode: PopupContentMode;
 };
 
-const renderEmptyMode = function(): JSX.Element {
+const renderEmptyMode = function(classes: Record<string, string>): JSX.Element {
   return (
-    <Box>
+    <Box className={classes.box}>
       <Typography component="p">This page is not saved.</Typography>
     </Box>
   );
@@ -80,7 +86,7 @@ const renderEditingMode = function(
     classes: Record<string, string>): JSX.Element {
   return (
     <>
-      <Box className={classes.box}>
+      <Box className={classes.boxMiddle}>
         <TextField
           label="Title"
           value={title}
@@ -104,7 +110,7 @@ const renderEditingMode = function(
           handleDeleteKeyword={handleDeleteKeyword}
         />
       </Box>
-      <Grid container justify="center">
+      <Grid container justify="center" className={classes.buttonSpacing}>
         <Grid item>
           <Button
             size="small"
@@ -134,17 +140,43 @@ const renderSavedMode = function(
     title: string,
     description: string,
     keywords: string[],
+    handleEditButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+    handleDeleteButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
     classes: Record<string, string>): JSX.Element {
   return (
-    <Box className={classes.box}>
-      <Typography className={classes.pageTitle}>
-        {title}
-      </Typography>
-      <Typography component="p" className={classes.pageDescription}>
-        {description}
-      </Typography>
-      <KeywordChipInput keywords={keywords} disabled={true} />
-    </Box>
+    <>
+      <Box className={classes.boxMiddle}>
+        <Typography className={classes.pageTitle}>
+          {title}
+        </Typography>
+        <Typography component="p" className={classes.pageDescription}>
+          {description}
+        </Typography>
+        <KeywordChipInput keywords={keywords} disabled={true} />
+      </Box>
+      <Grid container justify="center" className={classes.buttonSpacing}>
+        <Grid item>
+          <Button
+            size="small"
+            variant="contained"
+            aria-label="edit"
+            className={classes.button}
+            onClick={handleEditButton}
+          >
+            Edit
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            aria-label="delete"
+            className={classes.button}
+            onClick={handleDeleteButton}
+          >
+            Delete
+          </Button>
+        </Grid>
+      </Grid>
+    </>
   );
 };
 
@@ -190,9 +222,18 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     setMode('saved');
   };
 
+  const handleEditButton = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    setMode('editing');
+  };
+
+  const handleDeleteButton = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    // TODO: add mechanism for deleting the item
+    setMode('empty');
+  };
+
   switch (mode) {
     case 'empty':
-      return renderEmptyMode();
+      return renderEmptyMode(classes);
     case 'editing':
       if (title === undefined || description === undefined || keywords === undefined) {
         console.error('Error: one or more of title, description, and keywords are undefined.');
@@ -207,11 +248,12 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
         console.error('Error: one or more of title, description, and keywords are undefined.');
         return <Typography component="p">An error has occurred.</Typography>;
       } else {
-        return renderSavedMode(title, description, keywords, classes);
+        return renderSavedMode(title, description, keywords, handleEditButton,
+          handleDeleteButton, classes);
       }
     default:
       console.error(`Mode '${mode}' not recognized, defaulting to 'empty'.`);
-      return renderEmptyMode();
+      return renderEmptyMode(classes);
   }
 };
 

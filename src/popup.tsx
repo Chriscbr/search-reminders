@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import PopupView from './components/PopupView';
 import { Reminder } from './common';
 import { chromeRuntimeSendMessage, chromeTabsQuery } from './chrome_helpers';
+import 'typeface-roboto';
 
 const requestReminderFromURL = function(url: string): Promise<string> {
   console.log(`Sending request getReminderFromURL with url: ${url}.`);

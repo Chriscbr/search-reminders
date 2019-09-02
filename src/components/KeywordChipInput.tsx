@@ -6,7 +6,7 @@ import Chip from '@material-ui/core/Chip';
 const useStyles = makeStyles({
   chip: {
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    margin: '0 8px 0 0',
+    // margin: '0 8px 0 0',
   },
 });
 
