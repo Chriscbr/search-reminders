@@ -1,4 +1,4 @@
-# Set up local development
+## Set up local development
 
 Install the latest npm and nvm. As of current writing:
 ```
@@ -17,7 +17,7 @@ $ npm install
 If there are any build issues, consider trying to emulate the builds made using
 Travis CI [here](https://travis-ci.org/Chriscbr/search-reminders/builds/).
 
-## Build for deployment
+### Build for deployment
 
 ```
 $ npm run build
@@ -26,7 +26,7 @@ Build will be output to the `/dist` folder. To load the extension, go to
 `chrome://extensions/`, enable **Developer mode** (button in the top-right), and
 click **Load unpacked extension**. Select the project's `/dist` folder.
 
-## Build for development
+### Build for development
 
 ```
 $ npm run watch
@@ -37,41 +37,26 @@ want to test changes, by clicking on the refresh button on
 `chrome://extensions`.
 
 
-# TODOs
-- Refactor data flow to minimize computation / complexity of transferring the
-ReminderStore, KeywordMap, and/or the ReminderURLMap/Helper with serialization
-  - Store all data in chrome local storage as just a list of reminders, which
-  can then be processed into the necessary fast data structures when the
-  extension's background page is loaded
-  - content_script and popup can both get the data they need just by
-  message passing with the background process
-- Improve logging...?
+## TODOs
 - Rename things from "reminders" to "saved items" to generalize potential
 future uses
 - Add unit tests
-- Refactor content_script.js
-- ~~Add JSON serialization using different library (e.g. classValidator)~~
-  - I don't think there are any good serialization libraries that are
-  lightweight and support the kind of nested data structures I'd like. 
-  - "serialize-javascript" supports serializing almost anything, but it
-  unnecessarily includes method information, and to deserialize you have to use
-  eval, which is necessarily dangeorus.
-  - "class-transformer" provides a very nice syntax, but it created huge bundles
-  (possibly avoidable with more research - not sure), and it did not support
-  complex structures like `Map<K, Set<V>>` natively.
 - Add feature: on any webpage, click extension and click button to creating a
 reminder based on it
   - Make saved item descriptions editable
   - Allow users to add search keywords
 - Add ability on options page to see list of saved pages
-- Handle duplicate webpages (create another hashmap?) / prevent duplicates from
-occurring in the reminder store
+- Handle duplicate webpages (create another hashmap?) / prevent duplicates, or
+even remind the user if there is another page with a similar URL?
 - Add animation for when reminder list loads onto page
 - Support different search engines, like DuckDuckGo
+- Improve logging...?
 - Read about Redux, and evaluate if it would be useful for this project
 - Update extension icons
+- Look into code splitting to improve bundle sizes?
+<https://reactjs.org/docs/code-splitting.html>
 
-# Project structure
+## Project structure
 
 ```
 ├── README.md               - This file you are reading.
@@ -100,7 +85,7 @@ occurring in the reminder store
     └── webpack.prod.js     - Bundling settings for "build" script
 ```
 
-# Data flow
+## Data flow
 - `background.js` is the "master" process, in the sense that it is the only
 script that updates and retrieves user data from the
 [Chrome Sync Storage Area](https://developer.chrome.com/extensions/storage).
@@ -109,7 +94,7 @@ script that updates and retrieves user data from the
 [message passing](https://developer.chrome.com/extensions/messaging) in order
 to update or receive data.
 
-# Debugging notes
+## Debugging notes
 To see what's inside Chrome local storage for the app, open the developer
 console (Ctrl + Shift + I) from the extension's background or options pages,
 and run the following snippet:

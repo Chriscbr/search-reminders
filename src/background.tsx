@@ -89,7 +89,7 @@ const addMessageListener = function(reminderStore: ReminderStore,
                   'Received message from the extension.');
       console.log(`Message operation: ${request.operation}`);
 
-      if (request.operation === 'requestRelevantReminders') {
+      if (request.operation === 'getRelevantReminders') {
 
         const keywords: string[] = request.keywords;
 
