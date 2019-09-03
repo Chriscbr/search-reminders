@@ -6,19 +6,26 @@ import ReminderList from './ReminderList';
 
 type ReminderAppProps = {
   initReminders: Reminder[];
-}
+};
 
-export const ReminderApp = function(props: ReminderAppProps): JSX.Element | null {
+export const ReminderApp = function(
+  props: ReminderAppProps,
+): JSX.Element | null {
   const [reminders, setReminders] = useState(props.initReminders);
 
-  const deleteButtonHandler = (event: React.MouseEvent, reminderId: number): void => {
-
+  const deleteButtonHandler = (
+    event: React.MouseEvent,
+    reminderId: number,
+  ): void => {
     // Update the state with a copy of the list with the reminder removed
     const remindersCopy = [...reminders];
     const index = remindersCopy.findIndex(
-      (reminder: Reminder): boolean => reminder.id === reminderId);
+      (reminder: Reminder): boolean => reminder.id === reminderId,
+    );
     if (index === -1) {
-      console.error(`Error removing reminderId ${reminderId} from reminder list:`);
+      console.error(
+        `Error removing reminderId ${reminderId} from reminder list:`,
+      );
       console.error(reminders);
       return;
     }
@@ -28,9 +35,15 @@ export const ReminderApp = function(props: ReminderAppProps): JSX.Element | null
 
     // Update the state information in local storage
     chromeRuntimeSendMessage({ operation: 'deleteReminder', index: index })
-      .then((response) => console.log(`deleteReminder message sent, recieved response: ${response}`))
-      .catch((error) => console.log(`Error sending deleteReminder message: ${error}`));
-  }
+      .then(response =>
+        console.log(
+          `deleteReminder message sent, recieved response: ${response}`,
+        ),
+      )
+      .catch(error =>
+        console.log(`Error sending deleteReminder message: ${error}`),
+      );
+  };
 
   if (reminders.length === 0) return null;
 

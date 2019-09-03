@@ -2,41 +2,43 @@ import { chromeRuntimeSendMessage } from './chrome_helpers';
 
 const addTestDataButtonHandler = function(): void {
   chromeRuntimeSendMessage({ operation: 'addTestData' })
-    .then((response) => {
+    .then(response => {
       if (response === 'SUCCESS') {
         console.log(`addTestData response: ${response}`);
       } else {
         throw new Error(`addTestData response: ${response}`);
       }
     })
-    .catch((error) => {
-      console.log(`Error during communication with addTestData: ${error}`)
+    .catch(error => {
+      console.log(`Error during communication with addTestData: ${error}`);
     });
 };
 
 const deleteSavedDataButtonHandler = function(): void {
   chromeRuntimeSendMessage({ operation: 'deleteSavedData' })
-    .then((response) => {
+    .then(response => {
       if (response === 'SUCCESS') {
         console.log(`deleteSavedData response: ${response}`);
       } else {
         throw new Error(`deleteSavedData response: ${response}`);
       }
     })
-    .catch((error) => {
-      console.log(`Error during communication with deleteSavedData: ${error}`)
+    .catch(error => {
+      console.log(`Error during communication with deleteSavedData: ${error}`);
     });
 };
 
-const setupEventListener = function(elemId: string,
-                                    event: string,
-                                    handler: () => unknown): void {
+const setupEventListener = function(
+  elemId: string,
+  event: string,
+  handler: () => unknown,
+): void {
   const elem = document.getElementById(elemId);
   if (elem === null) {
-    throw new Error('Delete data button can\'t be found');
+    throw new Error("Delete data button can't be found");
   }
   elem.addEventListener(event, handler);
-}
+};
 
 const setupEventListeners = function(): void {
   setupEventListener('addTestData', 'click', addTestDataButtonHandler);

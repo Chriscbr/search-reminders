@@ -1,5 +1,5 @@
-import React from "react";
-import { Reminder } from "../common";
+import React from 'react';
+import { Reminder } from '../common';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -7,7 +7,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import Delete from '@material-ui/icons/Delete';
-import makeStyles from "@material-ui/core/styles/makeStyles";
+import makeStyles from '@material-ui/core/styles/makeStyles';
 
 const useStyles = makeStyles({
   reminderCard: {
@@ -52,7 +52,11 @@ export const ReminderItem = function(props: ReminderItemProps): JSX.Element {
   return (
     <Card className={classes.reminderCard}>
       <CardContent className={classes.reminderCardContent}>
-        <Typography component="h2" className={classes.reminderTitle} gutterBottom>
+        <Typography
+          component="h2"
+          className={classes.reminderTitle}
+          gutterBottom
+        >
           {reminder.title}
         </Typography>
         <Typography component="p" className={classes.reminderDescription}>
@@ -61,20 +65,20 @@ export const ReminderItem = function(props: ReminderItemProps): JSX.Element {
       </CardContent>
       <CardActions>
         <Button
-            size="small"
-            href={reminder.url}
-            target="_blank"
-            aria-label="open"
-          >
+          size="small"
+          href={reminder.url}
+          target="_blank"
+          aria-label="open"
+        >
           <OpenInNew className={classes.extendedIcon} fontSize="small" />
           Open
         </Button>
         <div className={classes.grow}></div>
         <Button
-            size="small"
-            aria-label="open"
-            onClick={(event): void => deleteButtonHandler(event, reminder.id)}
-          >
+          size="small"
+          aria-label="open"
+          onClick={(event): void => deleteButtonHandler(event, reminder.id)}
+        >
           <Delete className={classes.extendedIcon} fontSize="small" />
           Remove
         </Button>

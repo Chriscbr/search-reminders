@@ -12,7 +12,13 @@ export class Reminder {
   description: string;
   keywords: string[];
 
-  constructor(id: number, url: string, title: string, description: string, keywords: string[]) {
+  constructor(
+    id: number,
+    url: string,
+    title: string,
+    description: string,
+    keywords: string[],
+  ) {
     this.id = id;
     this.url = url;
     this.title = title;
@@ -34,7 +40,7 @@ export class Reminder {
   // might as well implement this to be clear what values we are checking for
   equalTo(other: Reminder): boolean {
     if (this === other) return true;
-    return (typeof this === typeof other) && (this.toJSON() === other.toJSON());
+    return typeof this === typeof other && this.toJSON() === other.toJSON();
   }
 
   toJSON(): string {
@@ -43,7 +49,7 @@ export class Reminder {
       url: this.url,
       title: this.title,
       description: this.description,
-      keywords: this.keywords
+      keywords: this.keywords,
     });
   }
 
@@ -82,9 +88,14 @@ export class ReminderStore {
   }
 
   create(reminderParams: ReminderParams): Reminder {
-    const {url, title, description, keywords} = {...reminderParams};
+    const { url, title, description, keywords } = { ...reminderParams };
     const reminder = new Reminder(
-      this.currentId, url, title, description, keywords);
+      this.currentId,
+      url,
+      title,
+      description,
+      keywords,
+    );
     reminder.id = this.currentId;
     this.data.set(this.currentId++, reminder);
     return reminder;
@@ -94,8 +105,10 @@ export class ReminderStore {
     const existingReminder = this.data.get(reminder.id);
     if (existingReminder !== undefined) {
       if (!reminder.equalTo(existingReminder)) {
-        throw new Error('Tried adding a reminder which conflicts with existing data!' +
-          `reminder added: ${reminder}, existing reminder: ${existingReminder}`);
+        throw new Error(
+          'Tried adding a reminder which conflicts with existing data!' +
+            `reminder added: ${reminder}, existing reminder: ${existingReminder}`,
+        );
       }
     } else {
       this.data.set(reminder.id, reminder);
@@ -116,13 +129,13 @@ export class ReminderStore {
     this.data.clear();
     this.currentId = 0;
   }
-} 
+}
 
 /**
  * Map from keywords to Reminder IDs.
  */
 export class KeywordMap {
-  data: Map<string, Set<number>>
+  data: Map<string, Set<number>>;
 
   constructor() {
     this.data = new Map();
@@ -130,7 +143,7 @@ export class KeywordMap {
 
   add(reminder: Reminder): void {
     const reminderId = reminder.id;
-    reminder.keywords.forEach((keyword) => {
+    reminder.keywords.forEach(keyword => {
       const keywordIdSet = this.data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.add(reminderId);
@@ -142,7 +155,7 @@ export class KeywordMap {
 
   remove(reminder: Reminder): void {
     const reminderId = reminder.id;
-    reminder.keywords.forEach((keyword) => {
+    reminder.keywords.forEach(keyword => {
       const keywordIdSet = this.data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.delete(reminderId);
@@ -172,8 +185,10 @@ export class ReminderURLMap {
 
   add(reminder: Reminder): void {
     if (this.data.has(reminder.url)) {
-      console.log('Warning: a reminder with this URL has already been added. ' +
-        'The reminderId assigned to it is getting replaced.')
+      console.log(
+        'Warning: a reminder with this URL has already been added. ' +
+          'The reminderId assigned to it is getting replaced.',
+      );
     }
     this.data.set(reminder.url, reminder.id);
   }

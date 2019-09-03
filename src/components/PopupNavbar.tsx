@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     minWidth: 'max-content',
   },
   grow: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   extendedIcon: {
     marginRight: '5px',
@@ -42,16 +42,16 @@ export const PopupNavbar = function(): JSX.Element {
       <Grid item className={classes.grow} />
       <Grid item>
         <Button
-            size="small"
-            aria-label="settings"
-            onClick={(): void => chrome.runtime.openOptionsPage()}
-          >
+          size="small"
+          aria-label="settings"
+          onClick={(): void => chrome.runtime.openOptionsPage()}
+        >
           <Settings className={classes.extendedIcon} fontSize="small" />
           Settings
         </Button>
       </Grid>
     </Grid>
   );
-}
+};
 
 export default PopupNavbar;

@@ -13,7 +13,7 @@ const useStyles = makeStyles({
     width: '300px',
   },
   titleBox: {
-    padding: '10px'
+    padding: '10px',
   },
   title: {
     fontSize: '1.25rem',
@@ -22,7 +22,7 @@ const useStyles = makeStyles({
 
 type PopupViewProps = {
   getCurrentPageReminder: () => Promise<Reminder | null>;
-}
+};
 
 export const PopupView = function(props: PopupViewProps): JSX.Element {
   const classes = useStyles();
@@ -41,7 +41,7 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
         <Async.Fulfilled>
           {(data: Reminder | null): JSX.Element => {
             if (data === null) {
-              return <PopupContent initMode="empty" />
+              return <PopupContent initMode="empty" />;
             } else {
               return (
                 <PopupContent
@@ -50,14 +50,18 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
                   initKeywords={data.keywords}
                   initMode="saved"
                 />
-              )
+              );
             }
           }}
         </Async.Fulfilled>
         <Async.Rejected>
           {(error: Error): JSX.Element => {
-            console.error(`An error occurred loading getCurrentPageReminder data: ${error}`);
-            return <Typography component="p">An error has occurred.</Typography>;
+            console.error(
+              `An error occurred loading getCurrentPageReminder data: ${error}`,
+            );
+            return (
+              <Typography component="p">An error has occurred.</Typography>
+            );
           }}
         </Async.Rejected>
       </Async>

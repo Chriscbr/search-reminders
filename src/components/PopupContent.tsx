@@ -45,7 +45,7 @@ const useStyles = makeStyles({
   },
   button: {
     margin: '8px',
-  }
+  },
 });
 
 /**
@@ -74,16 +74,21 @@ const renderEmptyMode = function(classes: Record<string, string>): JSX.Element {
 };
 
 const renderEditingMode = function(
-    title: string,
-    description: string,
-    keywords: string[],
-    handleChangeTitle: (event: React.ChangeEvent<HTMLInputElement>) => void,
-    handleChangeDescription: (event: React.ChangeEvent<HTMLInputElement>) => void,
-    handleAddKeyword: (keyword: string) => void,
-    handleDeleteKeyword: (deletedKeyword: string, index: number) => void,
-    handleSaveButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-    handleExitButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-    classes: Record<string, string>): JSX.Element {
+  title: string,
+  description: string,
+  keywords: string[],
+  handleChangeTitle: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  handleChangeDescription: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  handleAddKeyword: (keyword: string) => void,
+  handleDeleteKeyword: (deletedKeyword: string, index: number) => void,
+  handleSaveButton: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void,
+  handleExitButton: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void,
+  classes: Record<string, string>,
+): JSX.Element {
   return (
     <>
       <Box className={classes.boxMiddle}>
@@ -137,18 +142,21 @@ const renderEditingMode = function(
 };
 
 const renderSavedMode = function(
-    title: string,
-    description: string,
-    keywords: string[],
-    handleEditButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-    handleDeleteButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
-    classes: Record<string, string>): JSX.Element {
+  title: string,
+  description: string,
+  keywords: string[],
+  handleEditButton: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void,
+  handleDeleteButton: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void,
+  classes: Record<string, string>,
+): JSX.Element {
   return (
     <>
       <Box className={classes.boxMiddle}>
-        <Typography className={classes.pageTitle}>
-          {title}
-        </Typography>
+        <Typography className={classes.pageTitle}>{title}</Typography>
         <Typography component="p" className={classes.pageDescription}>
           {description}
         </Typography>
@@ -188,11 +196,15 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const [mode, setMode] = useState(initMode);
   const classes = useStyles();
 
-  const handleChangeTitle = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleChangeTitle = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
     setTitle(event.target.value);
   };
 
-  const handleChangeDescription = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleChangeDescription = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
     setDescription(event.target.value);
   };
 
@@ -204,29 +216,40 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     }
   };
 
-  const handleDeleteKeyword = (deletedKeyword: string, _index: number): void => {
+  const handleDeleteKeyword = (
+    deletedKeyword: string,
+    _index: number,
+  ): void => {
     if (keywords === undefined) {
       console.error('Unable to delete keyword, keywords is undefined.');
     } else {
-      setKeywords(keywords.filter((keyword) => keyword !== deletedKeyword));
+      setKeywords(keywords.filter(keyword => keyword !== deletedKeyword));
     }
   };
 
-  const handleSaveButton = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+  const handleSaveButton = (
+    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): void => {
     // TODO: add actual saving mechanism
     setMode('saved');
   };
 
-  const handleExitButton = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+  const handleExitButton = (
+    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): void => {
     // TODO: add mechanism for reloading content from saved data
     setMode('saved');
   };
 
-  const handleEditButton = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+  const handleEditButton = (
+    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): void => {
     setMode('editing');
   };
 
-  const handleDeleteButton = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+  const handleDeleteButton = (
+    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): void => {
     // TODO: add mechanism for deleting the item
     setMode('empty');
   };
@@ -235,21 +258,48 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     case 'empty':
       return renderEmptyMode(classes);
     case 'editing':
-      if (title === undefined || description === undefined || keywords === undefined) {
-        console.error('Error: one or more of title, description, and keywords are undefined.');
+      if (
+        title === undefined ||
+        description === undefined ||
+        keywords === undefined
+      ) {
+        console.error(
+          'Error: one or more of title, description, and keywords are undefined.',
+        );
         return <Typography component="p">An error has occurred.</Typography>;
       } else {
-        return renderEditingMode(title, description, keywords, handleChangeTitle,
-          handleChangeDescription, handleAddKeyword, handleDeleteKeyword,
-          handleSaveButton, handleExitButton, classes);
+        return renderEditingMode(
+          title,
+          description,
+          keywords,
+          handleChangeTitle,
+          handleChangeDescription,
+          handleAddKeyword,
+          handleDeleteKeyword,
+          handleSaveButton,
+          handleExitButton,
+          classes,
+        );
       }
     case 'saved':
-      if (title === undefined || description === undefined || keywords === undefined) {
-        console.error('Error: one or more of title, description, and keywords are undefined.');
+      if (
+        title === undefined ||
+        description === undefined ||
+        keywords === undefined
+      ) {
+        console.error(
+          'Error: one or more of title, description, and keywords are undefined.',
+        );
         return <Typography component="p">An error has occurred.</Typography>;
       } else {
-        return renderSavedMode(title, description, keywords, handleEditButton,
-          handleDeleteButton, classes);
+        return renderSavedMode(
+          title,
+          description,
+          keywords,
+          handleEditButton,
+          handleDeleteButton,
+          classes,
+        );
       }
     default:
       console.error(`Mode '${mode}' not recognized, defaulting to 'empty'.`);

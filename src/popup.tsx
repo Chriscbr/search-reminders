@@ -7,12 +7,14 @@ import 'typeface-roboto';
 
 const requestReminderFromURL = function(url: string): Promise<string> {
   console.log(`Sending request getReminderFromURL with url: ${url}.`);
-  return chromeRuntimeSendMessage({ operation: 'getReminderFromURL', url: url }) as
-    Promise<string>;
+  return chromeRuntimeSendMessage({
+    operation: 'getReminderFromURL',
+    url: url,
+  }) as Promise<string>;
 };
 
 const getCurrentPageReminder = function(): Promise<Reminder | null> {
-  return chromeTabsQuery({'active': true, 'lastFocusedWindow': true})
+  return chromeTabsQuery({ active: true, lastFocusedWindow: true })
     .then((tabs: chrome.tabs.Tab[]) => {
       const url = tabs[0].url;
       if (url === undefined) {
@@ -27,7 +29,8 @@ const getCurrentPageReminder = function(): Promise<Reminder | null> {
       } else {
         return Reminder.fromJSON(response);
       }
-    }).catch(err => {
+    })
+    .catch(err => {
       console.log(err);
       return null;
     });

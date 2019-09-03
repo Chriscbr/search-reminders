@@ -15,9 +15,11 @@ type KeywordChipInputProps = {
   disabled?: boolean;
   handleAddKeyword?: (keyword: string) => void;
   handleDeleteKeyword?: (deletedKeyword: string, index: number) => void;
-}
+};
 
-export const KeywordChipInput = function(props: KeywordChipInputProps): JSX.Element {
+export const KeywordChipInput = function(
+  props: KeywordChipInputProps,
+): JSX.Element {
   const { keywords, disabled, handleAddKeyword, handleDeleteKeyword } = props;
   const classes = useStyles();
 
@@ -27,22 +29,15 @@ export const KeywordChipInput = function(props: KeywordChipInputProps): JSX.Elem
       onAdd={handleAddKeyword}
       onDelete={handleDeleteKeyword}
       variant={disabled ? 'outlined' : 'filled'}
-      label='Keywords'
+      label="Keywords"
       disabled={disabled}
       classes={{ chip: classes.chip }}
       fullWidth
-      chipRenderer={(
-        {
-          value,
-          handleDelete,
-          className
-        },
-        key
-      ): JSX.Element => (
+      chipRenderer={({ value, handleDelete, className }, key): JSX.Element => (
         <Chip
           key={key}
           className={className}
-          size='small'
+          size="small"
           onDelete={disabled ? undefined : handleDelete}
           label={value}
         />
