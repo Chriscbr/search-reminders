@@ -1,64 +1,77 @@
 import {
   KeywordMap,
-  ReminderDataResponse,
   ReminderStore,
   ReminderParams,
-  ReminderURLMap
+  ReminderURLMap,
+  Reminder,
+  UserData,
+  UserDataJSON
 } from './common';
 import { chromeStorageSyncSet, chromeStorageSyncGet } from './chrome_helpers';
 import rawTestData from './testData.json';
 
-const loadDataFromStorage = function(): Promise<{ reminderStore: ReminderStore;
-                                                  keywordMap: KeywordMap; }> {
-  return chromeStorageSyncGet(['storedReminderStore', 'storedKeywordMap'])
+const loadDataFromStorage = function(): Promise<UserData> {
+  return chromeStorageSyncGet(['storedReminderList', 'storedCurrentId'])
     .then((response) => {
-      const data = response as ReminderDataResponse;
-      const reminderStore = ReminderStore.fromJSON(data.reminderStore);
-      const keywordMap = KeywordMap.fromJSON(data.keywordMap);
-      return {reminderStore: reminderStore, keywordMap: keywordMap};
+      const data = response as UserDataJSON;
+      const reminders = data.reminders.map((value: string) => Reminder.fromJSON(value));
+      return { reminders: reminders, currentId: data.currentId };
     })
     .catch((error) => {
       console.log(`Data not found in storage, possible error: ${error}`);
       console.log('Initializing with empty data');
-      return {reminderStore: new ReminderStore(), keywordMap: new KeywordMap()};
+      return { reminders: [], currentId: 0 };
     });
-}
+};
 
-const addTestData = function(testData: ReminderParams[],
-                             reminderStore: ReminderStore,
-                             keywordMap: KeywordMap,
-                             reminderURLMap: ReminderURLMap): void {
+const initializeData = function(reminders: Reminder[],
+                                reminderStore: ReminderStore,
+                                keywordMap: KeywordMap,
+                                reminderURLMap: ReminderURLMap): void {
+  reminders.forEach((reminder, _index) => {
+    reminderStore.add(reminder);
+    keywordMap.add(reminder);
+    reminderURLMap.add(reminder);
+  });
+};
+
+const initializeDataWithoutIds = function(testData: ReminderParams[],
+                                          reminderStore: ReminderStore,
+                                          keywordMap: KeywordMap,
+                                          reminderURLMap: ReminderURLMap): void {
   testData.forEach((params, _index) => {
     const reminder = reminderStore.create(params);
     keywordMap.add(reminder);
-    reminderURLMap.data.set(reminder.url, reminder.id);
+    reminderURLMap.add(reminder);
   });
-}
+};
 
-const saveLocalDataToStorage = function(reminderStore: ReminderStore,
-                                        keywordMap: KeywordMap): Promise<unknown> {
-  console.log('Saving local data to storage, with the following reminderStore and keywordMap:');
-  console.log(reminderStore);
-  console.log(keywordMap);
-  const userData: ReminderDataResponse = {
-    reminderStore: reminderStore.toJSON(),
-    keywordMap: keywordMap.toJSON()
+const saveLocalDataToStorage = function(reminderStore: ReminderStore): Promise<unknown> {
+  const reminders = [...reminderStore.data.values()];
+  console.log('Saving local data to storage, with the following list of reminders:');
+  console.log(reminders);
+  const userData = {
+    reminders: reminders.map((reminder: Reminder) => reminder.toJSON())
   };
   return chromeStorageSyncSet(userData);
-}
+};
 
 const deleteReminder = function(reminderStore: ReminderStore,
                                 keywordMap: KeywordMap,
+                                reminderURLMap: ReminderURLMap,
                                 reminderId: number): void {
   console.log(reminderStore);
   const reminder = reminderStore.remove(reminderId);
   keywordMap.remove(reminder);
+  reminderURLMap.remove(reminder);
 };
 
 const deleteAllLocalData = function(reminderStore: ReminderStore,
-                                    keywordMap: KeywordMap): void {
+                                    keywordMap: KeywordMap,
+                                    reminderURLMap: ReminderURLMap): void {
   reminderStore.clear();
   keywordMap.clear();
+  reminderURLMap.clear();
 };
 
 const addMessageListener = function(reminderStore: ReminderStore,
@@ -76,11 +89,38 @@ const addMessageListener = function(reminderStore: ReminderStore,
                   'Received message from the extension.');
       console.log(`Message operation: ${request.operation}`);
 
-      if (request.operation === 'getReminderData') {
+      if (request.operation === 'requestRelevantReminders') {
 
-        const response: ReminderDataResponse = {
-          reminderStore: reminderStore.toJSON(),
-          keywordMap: keywordMap.toJSON()
+        const keywords: string[] = request.keywords;
+
+        // Set, not a list, in order to avoid duplicate reminder IDs
+        const reminderIds: Set<number> = new Set();
+
+        // Collect all of the possible reminder IDs related to any of the keywords
+        keywords.forEach(keyword => {
+          const keywordIds = keywordMap.data.get(keyword);
+          if (keywordIds !== undefined) {
+            keywordIds.forEach(id => {
+              reminderIds.add(id);
+            });
+          }
+        });
+        console.log(`${reminderIds.size} relevant reminders found.`);
+
+        // Convert the set of reminder IDs to a list of Reminders
+        const reminderList: Reminder[] = [];
+        reminderIds.forEach(id => {
+          const reminder = reminderStore.data.get(id);
+          if (reminder === undefined) {
+            throw new Error(`Reminder not found in reminderMap for id: ${id}`);
+          }
+          console.log(`reminder: ${reminder}`);
+          reminderList.push(reminder);
+        });
+
+        // Sent out the response (a list of stringified reminders)
+        const response = {
+          reminders: reminderList.map(reminder => reminder.toJSON())
         };
         console.log('Sending response to getReminderData with data:');
         console.log(response);
@@ -88,8 +128,8 @@ const addMessageListener = function(reminderStore: ReminderStore,
 
       } else if (request.operation === 'addTestData') {
 
-        addTestData(testData, reminderStore, keywordMap, reminderURLMap);
-        saveLocalDataToStorage(reminderStore, keywordMap)
+        initializeDataWithoutIds(testData, reminderStore, keywordMap, reminderURLMap);
+        saveLocalDataToStorage(reminderStore)
           .then(() => {
             console.log('Saved data to sync storage.');
             console.log('Sending response to addTestData: SUCCESS');
@@ -103,8 +143,8 @@ const addMessageListener = function(reminderStore: ReminderStore,
 
       } else if (request.operation === 'deleteSavedData') {
 
-        deleteAllLocalData(reminderStore, keywordMap);
-        saveLocalDataToStorage(reminderStore, keywordMap)
+        deleteAllLocalData(reminderStore, keywordMap, reminderURLMap);
+        saveLocalDataToStorage(reminderStore)
           .then(() => {
             console.log('Deleted data and updated sync storage.');
             console.log('Sending response to deleteTestData: SUCCESS');
@@ -118,8 +158,8 @@ const addMessageListener = function(reminderStore: ReminderStore,
 
       } else if (request.operation === 'deleteReminder') {
 
-        deleteReminder(reminderStore, keywordMap, request.index);
-        saveLocalDataToStorage(reminderStore, keywordMap)
+        deleteReminder(reminderStore, keywordMap, reminderURLMap, request.index);
+        saveLocalDataToStorage(reminderStore)
           .then(() => {
             console.log('Deleted item and updated sync storage.');
             console.log('Sending response to deleteReminder: SUCCESS');
@@ -133,7 +173,6 @@ const addMessageListener = function(reminderStore: ReminderStore,
 
       } else if (request.operation === 'getReminderFromURL') {
 
-        console.log(reminderURLMap);
         const reminderId = reminderURLMap.data.get(request.url);
         if (reminderId === undefined) {
           console.log(`No reminder found for the URL ${request.url}. Sending "null".`);
@@ -156,13 +195,24 @@ const addMessageListener = function(reminderStore: ReminderStore,
       return true;
     }
   );
-}
+};
 
-// Initialize ReminderStore and KeywordMap by loading data from storage
-loadDataFromStorage().then(data => {
+// Initialize ReminderStore, KeywordMap, and ReminderURLMap by loading data
+// from storage. Then pass all useful data to addMessageListener where all
+// of the useful business logic event handlers are created.
+loadDataFromStorage().then((data: UserData) => {
+  const { reminders, currentId } = data;
   const testData = Array.from(rawTestData) as ReminderParams[];
-  const { reminderStore, keywordMap } = data;
+
+  // Map<number (id), Reminder>
+  const reminderStore = new ReminderStore(currentId);
+
+  // Map<string (keyword), Set<number (id)>>
+  const keywordMap = new KeywordMap();
+
   // Map<string (url), number (id)>
-  const reminderURLMap = new ReminderURLMap([...reminderStore.data.values()]);
+  const reminderURLMap = new ReminderURLMap();
+
+  initializeData(reminders, reminderStore, keywordMap, reminderURLMap);
   addMessageListener(reminderStore, keywordMap, reminderURLMap, testData);
 });

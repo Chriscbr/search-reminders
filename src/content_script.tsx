@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Reminder, ReminderStore, KeywordMap,
-  ReminderDataResponse } from './common';
+import { Reminder } from './common';
 import ReminderApp from './components/ReminderApp';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
 
@@ -18,62 +17,54 @@ const getSearchQuery = function(): string {
   return query;
 };
 
+/**
+ * Parses a query into an array of keywords.
+ * 
+ * Removes all non-alphanumeric characters and mixed whitespace characters.
+ * @param query a search query, e.g. "chocolate chip cookies"
+ */
 const getKeywordsFromQuery = function(query: string): string[] {
   return query.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').split(' ');
 };
 
-const requestReminderData = function(): Promise<ReminderDataResponse> {
-  console.log('Sending a request for Reminder data now.');
-  return chromeRuntimeSendMessage({ operation: 'getReminderData' }) as
-    Promise<ReminderDataResponse>;
+const requestRelevantReminders = function(keywords: string[]): Promise<Reminder[]> {
+  console.log('Sending a request for relevant reminders.');
+  return chromeRuntimeSendMessage({ operation: 'getRelevantReminders', keywords: keywords })
+    .then(response => {
+      const data = response as { reminders: string[] };
+      const reminders = data.reminders.map((value: string) => Reminder.fromJSON(value));
+      return reminders;
+    });
 };
 
-const injectionPoint = document.createElement('div');
+/**
+ * Creates the div which app content will be inserted to.
+ * 
+ * The div is inserted at the beginning of the search results, right before the
+ * div called "search" on Google.
+ */
+const setupInjectionPoint = function(): HTMLDivElement {
+  const injectionPoint = document.createElement('div');
 
-const searchBox = document.getElementById('search');
-if (searchBox === null) {
-  throw new Error('No div with id "search" found.');
-}
-if (searchBox.parentNode === null) {
-  throw new Error('Search div does not have a parent.');
-}
-searchBox.parentNode.insertBefore(injectionPoint, searchBox);
+  const searchBox = document.getElementById('search');
+  if (searchBox === null) {
+    throw new Error('No div with id "search" found.');
+  }
+  if (searchBox.parentNode === null) {
+    throw new Error('Search div does not have a parent.');
+  }
+  searchBox.parentNode.insertBefore(injectionPoint, searchBox);
 
-requestReminderData().then(data => {
-  console.log('Reminder data received, processing now.');
+  return injectionPoint;
+};
 
-  const reminderStore = ReminderStore.fromJSON(data.reminderStore);
-  const keywordMap = KeywordMap.fromJSON(data.keywordMap);
+const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
+console.log(`Keywords found: ${keywords}`);
+requestRelevantReminders(keywords).then(reminders => {
+  console.log('Reminder data received:', reminders);
 
-  const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
-  console.log(`Keywords found: ${keywords}`);
-
-  // Set, not a list, in order to avoid duplicate reminder IDs
-  let reminderIds: Set<number> = new Set();
-
-  // collect all of the possible reminder IDs related to any of the keywords
-  keywords.forEach(keyword => {
-    const keywordId = keywordMap.data.get(keyword);
-    if (keywordId !== undefined) {
-      keywordId.forEach(id => {
-        reminderIds.add(id);
-      });
-      reminderIds = keywordId;
-    }
-  });
-
-  console.log(`${reminderIds.size} relevant reminders found.`);
-  const reminderList: Reminder[] = [];
-  reminderIds.forEach(id => {
-    const reminder = reminderStore.data.get(id);
-    if (reminder === undefined) {
-      throw new Error(`Reminder not found in reminderMap for id: ${id}`);
-    }
-    console.log(`reminder: ${reminder}`);
-    reminderList.push(reminder);
-  });
-
-  const reminderApp = <ReminderApp initReminders={reminderList} />;
+  const injectionPoint = setupInjectionPoint();
+  const reminderApp = <ReminderApp initReminders={reminders} />;
   ReactDOM.render(reminderApp, injectionPoint, () => console.log('ReminderApp rendered.'));
 })
 .catch(err => {

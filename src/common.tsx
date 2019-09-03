@@ -30,6 +30,13 @@ export class Reminder {
     }
   }
 
+  // I'm not sure if I really trust JavaScript's default equality checking, so
+  // might as well implement this to be clear what values we are checking for
+  equalTo(other: Reminder): boolean {
+    if (this === other) return true;
+    return (typeof this === typeof other) && (this.toJSON() === other.toJSON());
+  }
+
   toJSON(): string {
     return JSON.stringify({
       id: this.id,
@@ -63,38 +70,15 @@ export class Reminder {
 }
 
 /**
- * Map from URLs to Reminder IDs.
- * 
- * This class is primarily used as a utility and does not contain unique
- * information not stored in the KeywordMap or ReminderStore, so it does not
- * need to be saved into local storage.
- */
-export class ReminderURLMap {
-  data: Map<string, number>;
-
-  constructor(reminderList: Reminder[]) {
-    this.data = this.initData(reminderList);
-  }
-
-  initData(reminderList: Reminder[]): Map<string, number> {
-    const data = new Map();
-    reminderList.forEach((reminder: Reminder): void => {
-      data.set(reminder.url, reminder.id);
-    });
-    return data;
-  } 
-}
-
-/**
  * Map from reminder IDs to Reminder objects.
  */
 export class ReminderStore {
   data: Map<number, Reminder>;
   currentId: number;
 
-  constructor() {
+  constructor(startingId: number) {
     this.data = new Map();
-    this.currentId = 0;
+    this.currentId = startingId;
   }
 
   create(reminderParams: ReminderParams): Reminder {
@@ -106,10 +90,22 @@ export class ReminderStore {
     return reminder;
   }
 
+  add(reminder: Reminder): void {
+    const existingReminder = this.data.get(reminder.id);
+    if (existingReminder !== undefined) {
+      if (!reminder.equalTo(existingReminder)) {
+        throw new Error('Tried adding a reminder which conflicts with existing data!' +
+          `reminder added: ${reminder}, existing reminder: ${existingReminder}`);
+      }
+    } else {
+      this.data.set(reminder.id, reminder);
+    }
+  }
+
   remove(reminderId: number): Reminder {
     const reminder = this.data.get(reminderId);
     if (reminder === undefined) {
-      throw new Error(`Invalid reminderId: ${reminderId}`);
+      throw new Error(`Reminder ID not found in ReminderStore: ${reminderId}`);
     } else {
       this.data.delete(reminderId);
       return reminder;
@@ -119,26 +115,6 @@ export class ReminderStore {
   clear(): void {
     this.data.clear();
     this.currentId = 0;
-  }
-
-  toJSON(): string {
-    return JSON.stringify([this.currentId,
-      [...this.data].map((value: [number, Reminder]) => {
-        return [value[0], value[1].toJSON()];
-    })]);
-  }
-
-  static fromJSON(jsonStr: string): ReminderStore {
-    const json: [
-      number,
-      [number, string][]
-    ] = JSON.parse(jsonStr);
-    const reminderStore = new ReminderStore();
-    reminderStore.currentId = json[0];
-    reminderStore.data = new Map(json[1].map(pair => {
-      return [pair[0], Reminder.fromJSON(pair[1])];
-    }));
-    return reminderStore;
   }
 } 
 
@@ -153,9 +129,6 @@ export class KeywordMap {
   }
 
   add(reminder: Reminder): void {
-    if (reminder.id === null) {
-      throw new Error('Reminder does not contain an id value.');
-    }
     const reminderId = reminder.id;
     reminder.keywords.forEach((keyword) => {
       const keywordIdSet = this.data.get(keyword);
@@ -168,9 +141,6 @@ export class KeywordMap {
   }
 
   remove(reminder: Reminder): void {
-    if (reminder.id === null) {
-      throw new Error('Reminder does not contain an id value.');
-    }
     const reminderId = reminder.id;
     reminder.keywords.forEach((keyword) => {
       const keywordIdSet = this.data.get(keyword);
@@ -188,25 +158,46 @@ export class KeywordMap {
   clear(): void {
     this.data.clear();
   }
+}
 
-  toJSON(): string {
-    return JSON.stringify([...this.data].map((value: [string, Set<number>]) => {
-      return [value[0], Array.from(value[1])];
-    }));
+/**
+ * Map from URLs to Reminder IDs.
+ */
+export class ReminderURLMap {
+  data: Map<string, number>;
+
+  constructor() {
+    this.data = new Map();
   }
 
-  static fromJSON(jsonStr: string): KeywordMap {
-    const json: [string, number[]][] = JSON.parse(jsonStr);
-    const keywordMap = new KeywordMap();
-    keywordMap.data = new Map(json.map((value: [string, number[]]) => {
-      return [value[0], new Set(value[1])];
-    }));
-    return keywordMap;
+  add(reminder: Reminder): void {
+    if (this.data.has(reminder.url)) {
+      console.log('Warning: a reminder with this URL has already been added. ' +
+        'The reminderId assigned to it is getting replaced.')
+    }
+    this.data.set(reminder.url, reminder.id);
+  }
+
+  remove(reminder: Reminder): void {
+    const existingReminder = this.data.get(reminder.url);
+    if (existingReminder === undefined) {
+      throw new Error(`Reminder not found in ReminderURLMap: ${reminder}`);
+    } else {
+      this.data.delete(reminder.url);
+    }
+  }
+
+  clear(): void {
+    this.data.clear();
   }
 }
 
-// TODO: rename this variable?
-export type ReminderDataResponse = {
-  reminderStore: string;
-  keywordMap: string;
+export type UserData = {
+  reminders: Reminder[]; // array of Reminder objects
+  currentId: number; // number that new reminder IDs should start at
+};
+
+export type UserDataJSON = {
+  reminders: string[];
+  currentId: number;
 };

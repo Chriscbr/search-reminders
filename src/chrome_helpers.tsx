@@ -23,4 +23,4 @@ export const chromeStorageSyncGet = function(keys: string | string[]): Promise<u
 
 export const chromeTabsQuery = function(query: object): Promise<chrome.tabs.Tab[]> {
   return promisify(chrome.tabs.query.bind(chrome.tabs), query) as Promise<chrome.tabs.Tab[]>;
-}
+};
