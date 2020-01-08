@@ -50,11 +50,15 @@ reminder based on it
 even remind the user if there is another page with a similar URL?
 - Add animation for when reminder list loads onto page
 - Support different search engines, like DuckDuckGo
-- Improve logging...?
+- Improve logging infrastructure? Enable/disable logging with a setting?
 - Read about Redux, and evaluate if it would be useful for this project
 - Update extension icons
 - Look into code splitting to improve bundle sizes?
 <https://reactjs.org/docs/code-splitting.html>
+- Add "Hide" or "Close" button to the right side of "Pages you have saved"
+- Consider adding some kind of different background, or accent of some kind
+using CSS to distinguish extension information from regular Google search
+results
 
 ## Project structure
 
@@ -64,12 +68,18 @@ even remind the user if there is another page with a similar URL?
 ├── node_modules            - Stores dependency code during development
 ├── package-lock.json       - Dependency metadata
 ├── package.json            - General metadata and dependency list
+├── .eslintrc.js            - Settings for the ESLint tool
+├── .eslintignore           - List of files/directories for ESLint to ignore
+├── .prettierrc.js          - Settings for Prettier (automatic code formatting)
+├── .travis.yml             - Settings for Travis (automatic CI/CD / testing)
+├── tsconfig.json           - Settings for compiling TypeScript to JavaScript
 ├── public                  - Non-JS assets used by the extension
 │   ├── images              - Icons and such
 │   ├── manifest.json       - Chrome extension metadata information
 │   ├── options.html        - HTML layout for options page
 │   └── popup.html          - HTML layout for popup
 ├── src                     - Source code
+│   ├── components/         - Folder containing all React components
 │   ├── background.tsx      - Code that runs in the background and stores data
 │   ├── chrome_helpers.tsx  - Wrapper functions for Chrome APIs
 │   ├── common.tsx          - Code that is shared between modules
@@ -77,17 +87,15 @@ even remind the user if there is another page with a similar URL?
 │   ├── options.tsx         - Code that runs on the options page
 │   ├── popup.tsx           - Code that runs on the popup
 │   ├── testData.json       - Test data
-│   └── ui_components.tsx   - React components
-├── tsconfig.json           - Settings for compiling TypeScript to JavaScript
 └── webpack                 - Settings for bundling all files into an extension
     ├── webpack.common.js   - General bundling settings
     ├── webpack.dev.js      - Bundling settings for "watch" script
     └── webpack.prod.js     - Bundling settings for "build" script
 ```
 
-## Data flow
-- `background.js` is the "master" process, in the sense that it is the only
-script that updates and retrieves user data from the
+## Architecture
+- `background.js` is the "master" process, in the sense that it is the core
+script which updates and retrieves user data from the
 [Chrome Sync Storage Area](https://developer.chrome.com/extensions/storage).
 - All other pages (`popup.html`, `options.html`, and the injected script
 `content_script.js`) communicate with `background.js` via

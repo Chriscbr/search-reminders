@@ -34,7 +34,7 @@ export const ReminderList = function(props: ReminderListProps): JSX.Element {
   return (
     <Box className={classes.reminderListWrapper}>
       <Typography component="h3" className={classes.reminderListTitle}>
-        {'Related saved items:'}
+        {'Pages you have saved:'}
       </Typography>
       {reminderItems}
     </Box>
