@@ -6,7 +6,8 @@ import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import PopupContent from './PopupContent';
 import PopupNavbar from './PopupNavbar';
-import { Reminder } from '../common';
+import { Reminder, RequestOperation } from '../common';
+import { chromeRuntimeSendMessage } from '../chrome_helpers';
 
 const useStyles = makeStyles({
   box: {
@@ -43,12 +44,30 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
             if (data === null) {
               return <PopupContent initMode="empty" />;
             } else {
+              const deleteReminder = (): void => {
+                chromeRuntimeSendMessage({
+                  operation: RequestOperation.DeleteReminder,
+                  reminderId: data.id,
+                })
+                  .then(response =>
+                    console.log(
+                      `deleteReminder message sent, recieved response: ${response}`,
+                    ),
+                  )
+                  .catch(error =>
+                    console.log(
+                      `Error sending deleteReminder message: ${error}`,
+                    ),
+                  );
+              };
+
               return (
                 <PopupContent
                   initTitle={data.title}
                   initDescription={data.description}
                   initKeywords={data.keywords}
                   initMode="saved"
+                  deleteReminder={deleteReminder}
                 />
               );
             }

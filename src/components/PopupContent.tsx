@@ -63,8 +63,10 @@ type PopupContentProps = {
   initDescription?: string;
   initKeywords?: string[];
   initMode: PopupContentMode;
+  deleteReminder?: () => void;
 };
 
+// TODO: add functionality to add page to reminders
 const renderEmptyMode = function(classes: Record<string, string>): JSX.Element {
   return (
     <Box className={classes.box}>
@@ -189,7 +191,13 @@ const renderSavedMode = function(
 };
 
 export const PopupContent = function(props: PopupContentProps): JSX.Element {
-  const { initTitle, initDescription, initKeywords, initMode } = props;
+  const {
+    initTitle,
+    initDescription,
+    initKeywords,
+    initMode,
+    deleteReminder,
+  } = props;
   const [title, setTitle] = useState(initTitle);
   const [description, setDescription] = useState(initDescription);
   const [keywords, setKeywords] = useState(initKeywords);
@@ -250,8 +258,16 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const handleDeleteButton = (
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void => {
-    // TODO: add mechanism for deleting the item
-    setMode('empty');
+    // Note: deleting the reminder could fail here, but for UI sake we will
+    // just render it being deleted anyway.
+    if (deleteReminder === undefined) {
+      console.error(
+        'Delete reminder was called even though there is no reminder associated with this page!',
+      );
+    } else {
+      deleteReminder();
+      setMode('empty');
+    }
   };
 
   switch (mode) {
