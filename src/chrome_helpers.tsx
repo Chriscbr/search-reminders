@@ -31,6 +31,10 @@ export const chromeStorageSyncGet = function(
   return promisify(chrome.storage.sync.get.bind(chrome.storage.sync), keys);
 };
 
+export const chromeStorageSyncClear = function(): Promise<unknown> {
+  return promisify(chrome.storage.sync.clear.bind(chrome.storage.sync));
+};
+
 export const chromeTabsQuery = function(
   query: object,
 ): Promise<chrome.tabs.Tab[]> {

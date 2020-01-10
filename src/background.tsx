@@ -13,11 +13,30 @@ import {
   GetRelevantRemindersRequest,
 } from './common';
 import { UnreachableCaseError } from './utils';
-import { chromeStorageSyncSet, chromeStorageSyncGet } from './chrome_helpers';
+import {
+  chromeStorageSyncSet,
+  chromeStorageSyncGet,
+  chromeStorageSyncClear,
+} from './chrome_helpers';
 import rawTestData from './testData.json';
 
+const saveLocalDataToStorage = function(
+  reminderStore: ReminderStore,
+): Promise<unknown> {
+  const reminders = reminderStore.values();
+  console.log(
+    'Saving local data to storage, with the following list of reminders:',
+  );
+  console.log(reminders);
+  const userData = {
+    reminders: reminders.map((reminder: Reminder) => reminder.toJSON()),
+    currentId: reminderStore.getCurrentId(),
+  };
+  return chromeStorageSyncSet(userData);
+};
+
 const loadDataFromStorage = function(): Promise<UserData> {
-  return chromeStorageSyncGet(['storedReminderList', 'storedCurrentId'])
+  return chromeStorageSyncGet(['reminders', 'currentId'])
     .then(response => {
       const data = response as UserDataJSON;
       const reminders = data.reminders.map((value: string) =>
@@ -27,8 +46,20 @@ const loadDataFromStorage = function(): Promise<UserData> {
     })
     .catch(error => {
       console.log(`Data not found in storage, possible error: ${error}`);
-      console.log('Initializing with empty data');
-      return { reminders: [], currentId: 0 };
+      console.log('Initializing with empty data.');
+      return saveLocalDataToStorage(new ReminderStore(0))
+        .then(() => {
+          console.log(
+            'Successfully initialized empty reminder list to local storage.',
+          );
+          return { reminders: [], currentId: 0 };
+        })
+        .catch(error => {
+          console.log('Unable to save empty user data to local storage.');
+          console.log(`Received error message: ${error}`);
+          console.log('Resuming with temporary empty user data.');
+          return { reminders: [], currentId: 0 };
+        });
     });
 };
 
@@ -56,20 +87,6 @@ const initializeDataWithoutIds = function(
     keywordMap.add(reminder);
     reminderURLMap.add(reminder);
   });
-};
-
-const saveLocalDataToStorage = function(
-  reminderStore: ReminderStore,
-): Promise<unknown> {
-  const reminders = [...reminderStore.data.values()];
-  console.log(
-    'Saving local data to storage, with the following list of reminders:',
-  );
-  console.log(reminders);
-  const userData = {
-    reminders: reminders.map((reminder: Reminder) => reminder.toJSON()),
-  };
-  return chromeStorageSyncSet(userData);
 };
 
 const deleteReminder = function(
@@ -118,7 +135,7 @@ const handleGetRelevantReminders = function(
 
   // Collect all of the reminder IDs related to any of the keywords
   keywords.forEach(keyword => {
-    const keywordIds = keywordMap.data.get(keyword);
+    const keywordIds = keywordMap.get(keyword);
     if (keywordIds !== undefined) {
       keywordIds.forEach(id => {
         reminderIds.add(id);
@@ -130,7 +147,7 @@ const handleGetRelevantReminders = function(
   // Convert the set of reminder IDs to a list of Reminders
   const reminderList: Reminder[] = [];
   reminderIds.forEach(id => {
-    const reminder = reminderStore.data.get(id);
+    const reminder = reminderStore.getReminder(id);
     if (reminder === undefined) {
       throw new Error(`Reminder not found in reminderMap for id: ${id}`);
     }
@@ -197,14 +214,14 @@ const handleDeleteUserData = function(
   sendResponse: (args?: unknown) => void,
 ): void {
   deleteAllLocalData(reminderStore, keywordMap, reminderURLMap);
-  saveLocalDataToStorage(reminderStore)
+  chromeStorageSyncClear()
     .then(() => {
-      console.log('Deleted data and updated sync storage.');
+      console.log('Deleted data and cleared sync storage.');
       console.log('Sending response to deleteTestData: SUCCESS');
       sendResponse('SUCCESS');
     })
     .catch(error => {
-      console.error(`Error occured updating sync storage: ${error}`);
+      console.error(`Error occured clearing sync storage: ${error}`);
       console.log('Sending response to deleteTestData: ERROR');
       sendResponse('ERROR');
     });
@@ -257,14 +274,14 @@ const handleGetReminderFromURL = function(
   reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
 ): void {
-  const reminderId = reminderURLMap.data.get(request.url);
+  const reminderId = reminderURLMap.get(request.url);
   if (reminderId === undefined) {
     console.log(
       `No reminder found for the URL ${request.url}. Sending "null".`,
     );
     sendResponse('null');
   } else {
-    const reminder = reminderStore.data.get(reminderId);
+    const reminder = reminderStore.getReminder(reminderId);
     if (reminder === null) {
       console.error(
         'Unexpected: reminderID found for URL, but Reminder data not found. Sending "null".',
@@ -370,6 +387,10 @@ const addMessageListener = function(
 // from storage. Then pass all useful data to addMessageListener where all
 // of the useful business logic event handlers are created.
 loadDataFromStorage().then((data: UserData) => {
+  console.log(
+    'Extension is being initialized. The following data was retrieved from local storage:',
+  );
+  console.log(data);
   const { reminders, currentId } = data;
   const testData = Array.from(rawTestData) as ReminderParams[];
 

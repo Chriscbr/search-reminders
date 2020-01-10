@@ -85,31 +85,30 @@ export class Reminder {
  * Map from reminder IDs to Reminder objects.
  */
 export class ReminderStore {
-  // TODO: make data field 'private' / only obtained through accessor method?
-  data: Map<number, Reminder>;
-  currentId: number;
+  _data: Map<number, Reminder>;
+  _currentId: number;
 
   constructor(startingId: number) {
-    this.data = new Map();
-    this.currentId = startingId;
+    this._data = new Map();
+    this._currentId = startingId;
   }
 
   create(reminderParams: ReminderParams): Reminder {
     const { url, title, description, keywords } = { ...reminderParams };
     const reminder = new Reminder(
-      this.currentId,
+      this._currentId,
       url,
       title,
       description,
       keywords,
     );
-    reminder.id = this.currentId;
-    this.data.set(this.currentId++, reminder);
+    reminder.id = this._currentId;
+    this._data.set(this._currentId++, reminder);
     return reminder;
   }
 
   add(reminder: Reminder): void {
-    const existingReminder = this.data.get(reminder.id);
+    const existingReminder = this._data.get(reminder.id);
     if (existingReminder !== undefined) {
       if (!reminder.equalTo(existingReminder)) {
         throw new Error(
@@ -118,23 +117,35 @@ export class ReminderStore {
         );
       }
     } else {
-      this.data.set(reminder.id, reminder);
+      this._data.set(reminder.id, reminder);
     }
   }
 
   remove(reminderId: number): Reminder {
-    const reminder = this.data.get(reminderId);
+    const reminder = this._data.get(reminderId);
     if (reminder === undefined) {
       throw new Error(`Reminder ID not found in ReminderStore: ${reminderId}`);
     } else {
-      this.data.delete(reminderId);
+      this._data.delete(reminderId);
       return reminder;
     }
   }
 
+  values(): Reminder[] {
+    return [...this._data.values()];
+  }
+
+  getReminder(reminderId: number): Reminder | undefined {
+    return this._data.get(reminderId);
+  }
+
+  getCurrentId(): number {
+    return this._currentId;
+  }
+
   clear(): void {
-    this.data.clear();
-    this.currentId = 0;
+    this._data.clear();
+    this._currentId = 0;
   }
 }
 
@@ -142,20 +153,20 @@ export class ReminderStore {
  * Map from keywords to Reminder IDs.
  */
 export class KeywordMap {
-  data: Map<string, Set<number>>;
+  _data: Map<string, Set<number>>;
 
   constructor() {
-    this.data = new Map();
+    this._data = new Map();
   }
 
   add(reminder: Reminder): void {
     const reminderId = reminder.id;
     reminder.keywords.forEach(keyword => {
-      const keywordIdSet = this.data.get(keyword);
+      const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.add(reminderId);
       } else {
-        this.data.set(keyword, new Set([reminderId]));
+        this._data.set(keyword, new Set([reminderId]));
       }
     });
   }
@@ -163,11 +174,11 @@ export class KeywordMap {
   remove(reminder: Reminder): void {
     const reminderId = reminder.id;
     reminder.keywords.forEach(keyword => {
-      const keywordIdSet = this.data.get(keyword);
+      const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.delete(reminderId);
         if (keywordIdSet.size === 0) {
-          this.data.delete(keyword);
+          this._data.delete(keyword);
         }
       } else {
         throw new Error(`KeywordMap does not have ${keyword} as a key.`);
@@ -175,8 +186,12 @@ export class KeywordMap {
     });
   }
 
+  get(keyword: string): Set<number> | undefined {
+    return this._data.get(keyword);
+  }
+
   clear(): void {
-    this.data.clear();
+    this._data.clear();
   }
 }
 
@@ -184,33 +199,37 @@ export class KeywordMap {
  * Map from URLs to Reminder IDs.
  */
 export class ReminderURLMap {
-  data: Map<string, number>;
+  _data: Map<string, number>;
 
   constructor() {
-    this.data = new Map();
+    this._data = new Map();
   }
 
   add(reminder: Reminder): void {
-    if (this.data.has(reminder.url)) {
+    if (this._data.has(reminder.url)) {
       console.log(
         'Warning: a reminder with this URL has already been added. ' +
           'The reminderId assigned to it is getting replaced.',
       );
     }
-    this.data.set(reminder.url, reminder.id);
+    this._data.set(reminder.url, reminder.id);
   }
 
   remove(reminder: Reminder): void {
-    const existingReminder = this.data.get(reminder.url);
+    const existingReminder = this._data.get(reminder.url);
     if (existingReminder === undefined) {
       throw new Error(`Reminder not found in ReminderURLMap: ${reminder}`);
     } else {
-      this.data.delete(reminder.url);
+      this._data.delete(reminder.url);
     }
   }
 
+  get(url: string): number | undefined {
+    return this._data.get(url);
+  }
+
   clear(): void {
-    this.data.clear();
+    this._data.clear();
   }
 }
 
