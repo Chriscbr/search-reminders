@@ -11,6 +11,7 @@ import {
   DeleteReminderRequest,
   GetReminderFromURLRequest,
   GetRelevantRemindersRequest,
+  UpdateReminderRequest,
 } from './common';
 import { UnreachableCaseError } from './utils';
 import {
@@ -89,12 +90,44 @@ const initializeDataWithoutIds = function(
   });
 };
 
+const updateReminder = function(
+  reminderId: number,
+  reminderTitle: string,
+  reminderDescription: string,
+  reminderKeywords: string[],
+  reminderStore: ReminderStore,
+  keywordMap: KeywordMap,
+): void {
+  // First, calculate the 'difference' between the current and updated keywords
+  const reminder = reminderStore.getReminder(reminderId);
+  if (reminder === undefined) {
+    throw new Error(`Reminder ID not found in reminderStore: ${reminderId}`);
+  }
+  const priorKeywords = reminder.keywords;
+  const addedKeywords = reminderKeywords.filter(
+    keyword => priorKeywords.indexOf(keyword) === -1,
+  );
+  const removedKeywords = priorKeywords.filter(
+    keyword => reminderKeywords.indexOf(keyword) === -1,
+  );
+
+  // Update the reminderStore and keywordMap respectively
+  reminderStore.update(
+    reminderId,
+    reminderTitle,
+    reminderDescription,
+    reminderKeywords,
+  );
+  keywordMap.update(reminderId, addedKeywords, removedKeywords);
+};
+
 const deleteReminder = function(
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
   reminderId: number,
 ): void {
+  console.log('Contents of reminderStore prior to deletion:');
   console.log(reminderStore);
   const reminder = reminderStore.remove(reminderId);
   keywordMap.remove(reminder);
@@ -117,7 +150,7 @@ const deleteAllLocalData = function(
  * and `reminderStore` to produce a list of stringified `Reminder`s.
  * It then returns this to the sender using `sendResponse`.
  *
- * @param request the request being handled
+ * @param request the request containing the keywords to search for
  * @param keywordMap reference to keyword map
  * @param reminderStore reference to reminder store
  * @param sendResponse callback function for sending the response message
@@ -228,11 +261,49 @@ const handleDeleteUserData = function(
 };
 
 /**
- * Handles a request to delete a Reminder with an associated ID.
- * Uses `reminderURLMap` to obtain the ID associated with the URL provided in
- * `request`, and then cross-references with `reminderStore` to get the full
- * `Reminder` object, which is then sent as a response.
+ * Handles a request to update a Reminder with an associated ID.
+ * Updates the reminder in the `reminderStore` and `keywordMap` (as this API
+ * does not currently allow changing a reminder's URL), and then saves the
+ * changes to local storage.
  *
+ * @param request the request containing the information to update with
+ * @param reminderStore reference to reminder store
+ * @param keywordMap reference to keyword map
+ * @param sendResponse callback function for sending the response message
+ */
+const handleUpdateReminder = function(
+  request: UpdateReminderRequest,
+  reminderStore: ReminderStore,
+  keywordMap: KeywordMap,
+  sendResponse: (args?: unknown) => void,
+): void {
+  updateReminder(
+    request.reminderId,
+    request.title,
+    request.description,
+    request.keywords,
+    reminderStore,
+    keywordMap,
+  );
+  saveLocalDataToStorage(reminderStore)
+    .then(() => {
+      console.log('Updated item and updated sync storage.');
+      console.log('Sending response to updateReminder: SUCCESS');
+      sendResponse('SUCCESS');
+    })
+    .catch(error => {
+      console.error(`Error occured updating sync storage: ${error}`);
+      console.log('Sending response to updateReminder: ERROR');
+      sendResponse('ERROR');
+    });
+};
+
+/**
+ * Handles a request to delete a Reminder with an associated ID.
+ * Updates the `reminderStore`, `keywordMap`, and `reminderURLMap` to have the
+ * data removed, and then saves the changes to local storage.
+ *
+ * @param request the request containing the request ID to delete
  * @param reminderStore reference to reminder store
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
@@ -347,6 +418,9 @@ const addMessageListener = function(
           reminderURLMap,
           sendResponse,
         );
+        break;
+      case RequestOperation.UpdateReminder:
+        handleUpdateReminder(request, reminderStore, keywordMap, sendResponse);
         break;
       case RequestOperation.DeleteReminder:
         handleDeleteReminder(

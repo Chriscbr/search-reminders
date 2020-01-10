@@ -121,6 +121,25 @@ export class ReminderStore {
     }
   }
 
+  update(
+    id: number,
+    title: string,
+    description: string,
+    keywords: string[],
+    url?: string,
+  ): void {
+    const reminder = this._data.get(id);
+    if (reminder === undefined) {
+      throw new Error(`Reminder ID not found in ReminderStore: ${id}`);
+    }
+    reminder.title = title;
+    reminder.description = description;
+    reminder.keywords = keywords;
+    if (url !== undefined) {
+      reminder.url = url;
+    }
+  }
+
   remove(reminderId: number): Reminder {
     const reminder = this._data.get(reminderId);
     if (reminder === undefined) {
@@ -167,6 +186,41 @@ export class KeywordMap {
         keywordIdSet.add(reminderId);
       } else {
         this._data.set(keyword, new Set([reminderId]));
+      }
+    });
+  }
+
+  /**
+   * Updates the keyword map given a reminder's ID and lists of added and
+   * removed keywords.
+   *
+   * Precondition: addedKeywords and removedKeywords have no words in common.
+   *
+   * @param reminderId the reminder's ID
+   * @param addedKeywords keywords that were added
+   * @param removedKeywords keywords that were removed
+   */
+  update(
+    reminderId: number,
+    addedKeywords: string[],
+    removedKeywords: string[],
+  ): void {
+    addedKeywords.forEach(keyword => {
+      const keywordIdSet = this._data.get(keyword);
+      if (keywordIdSet !== undefined) {
+        keywordIdSet.add(reminderId);
+      } else {
+        this._data.set(keyword, new Set([reminderId]));
+      }
+    });
+    removedKeywords.forEach(keyword => {
+      const keywordIdSet = this._data.get(keyword);
+      if (keywordIdSet !== undefined) {
+        keywordIdSet.delete(reminderId);
+      } else {
+        console.log(
+          `Warning: tried removing association from keyword ${keyword} to reminder ${reminderId}, but this keyword is not in the map.`,
+        );
       }
     });
   }
@@ -247,6 +301,7 @@ export const enum RequestOperation {
   GetRelevantReminders,
   AddTestData,
   DeleteUserData,
+  UpdateReminder,
   DeleteReminder,
   GetReminderFromURL,
 }
@@ -255,6 +310,7 @@ export type Request =
   | GetRelevantRemindersRequest
   | AddTestDataRequest
   | DeleteUserDataRequest
+  | UpdateReminderRequest
   | DeleteReminderRequest
   | GetReminderFromURLRequest;
 
@@ -268,6 +324,14 @@ export interface AddTestDataRequest extends RequestInterface {
 
 export interface DeleteUserDataRequest extends RequestInterface {
   operation: RequestOperation.DeleteUserData;
+}
+
+export interface UpdateReminderRequest extends RequestInterface {
+  operation: RequestOperation.UpdateReminder;
+  reminderId: number;
+  title: string;
+  description: string;
+  keywords: string[];
 }
 
 export interface DeleteReminderRequest extends RequestInterface {

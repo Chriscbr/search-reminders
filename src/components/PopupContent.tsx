@@ -63,6 +63,11 @@ type PopupContentProps = {
   initDescription?: string;
   initKeywords?: string[];
   initMode: PopupContentMode;
+  saveReminder?: (
+    title: string,
+    description: string,
+    keywords: string[],
+  ) => void;
   deleteReminder?: () => void;
 };
 
@@ -196,6 +201,7 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     initDescription,
     initKeywords,
     initMode,
+    saveReminder,
     deleteReminder,
   } = props;
   const [title, setTitle] = useState(initTitle);
@@ -238,7 +244,18 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const handleSaveButton = (
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void => {
-    // TODO: add actual saving mechanism
+    if (
+      saveReminder === undefined ||
+      title === undefined ||
+      description === undefined ||
+      keywords === undefined
+    ) {
+      console.error(
+        'Save reminder called even though there is no reminder associated on this page!',
+      );
+    } else {
+      saveReminder(title, description, keywords);
+    }
     setMode('saved');
   };
 

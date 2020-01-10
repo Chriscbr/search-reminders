@@ -44,6 +44,30 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
             if (data === null) {
               return <PopupContent initMode="empty" />;
             } else {
+              const saveReminder = (
+                title: string,
+                description: string,
+                keywords: string[],
+              ): void => {
+                chromeRuntimeSendMessage({
+                  operation: RequestOperation.UpdateReminder,
+                  reminderId: data.id,
+                  title: title,
+                  description: description,
+                  keywords: keywords,
+                })
+                  .then(response =>
+                    console.log(
+                      `updateReminder message sent, recieved response: ${response}`,
+                    ),
+                  )
+                  .catch(error =>
+                    console.log(
+                      `Error sending updateReminder message: ${error}`,
+                    ),
+                  );
+              };
+
               const deleteReminder = (): void => {
                 chromeRuntimeSendMessage({
                   operation: RequestOperation.DeleteReminder,
@@ -67,6 +91,7 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
                   initDescription={data.description}
                   initKeywords={data.keywords}
                   initMode="saved"
+                  saveReminder={saveReminder}
                   deleteReminder={deleteReminder}
                 />
               );

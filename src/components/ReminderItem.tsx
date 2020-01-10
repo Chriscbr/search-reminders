@@ -80,7 +80,7 @@ export const ReminderItem = function(props: ReminderItemProps): JSX.Element {
           onClick={(event): void => deleteButtonHandler(event, reminder.id)}
         >
           <Delete className={classes.extendedIcon} fontSize="small" />
-          Remove
+          Delete
         </Button>
       </CardActions>
     </Card>
