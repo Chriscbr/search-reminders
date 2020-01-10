@@ -1,7 +1,8 @@
 import { chromeRuntimeSendMessage } from './chrome_helpers';
+import { RequestOperation } from './common';
 
 const addTestDataButtonHandler = function(): void {
-  chromeRuntimeSendMessage({ operation: 'addTestData' })
+  chromeRuntimeSendMessage({ operation: RequestOperation.AddTestData })
     .then(response => {
       if (response === 'SUCCESS') {
         console.log(`addTestData response: ${response}`);
@@ -15,7 +16,7 @@ const addTestDataButtonHandler = function(): void {
 };
 
 const deleteSavedDataButtonHandler = function(): void {
-  chromeRuntimeSendMessage({ operation: 'deleteSavedData' })
+  chromeRuntimeSendMessage({ operation: RequestOperation.DeleteUserData })
     .then(response => {
       if (response === 'SUCCESS') {
         console.log(`deleteSavedData response: ${response}`);

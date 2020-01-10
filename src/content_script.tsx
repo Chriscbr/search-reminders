@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Reminder } from './common';
+import { Reminder, RequestOperation } from './common';
 import ReminderApp from './components/ReminderApp';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
 
@@ -37,7 +37,7 @@ const requestRelevantReminders = function(
 ): Promise<Reminder[]> {
   console.log('Sending a request for relevant reminders.');
   return chromeRuntimeSendMessage({
-    operation: 'getRelevantReminders',
+    operation: RequestOperation.GetRelevantReminders,
     keywords: keywords,
   }).then(response => {
     const data = response as { reminders: string[] };

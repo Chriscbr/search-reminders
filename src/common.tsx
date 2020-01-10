@@ -1,3 +1,9 @@
+/**
+ * A collection of parameters that can be used to create a `Reminder`.
+ * Unlike the `Reminder` class, a `ReminderParam` has no `id` associated, and
+ * likewise has no behavior associated (for conversion to/from JSON, parameter
+ * validation, etc.)
+ */
 export interface ReminderParams {
   url: string;
   title: string;
@@ -79,6 +85,7 @@ export class Reminder {
  * Map from reminder IDs to Reminder objects.
  */
 export class ReminderStore {
+  // TODO: make data field 'private' / only obtained through accessor method?
   data: Map<number, Reminder>;
   currentId: number;
 
@@ -216,3 +223,45 @@ export type UserDataJSON = {
   reminders: string[];
   currentId: number;
 };
+
+export const enum RequestOperation {
+  GetRelevantReminders,
+  AddTestData,
+  DeleteUserData,
+  DeleteReminder,
+  GetReminderFromURL,
+}
+
+export type Request =
+  | GetRelevantRemindersRequest
+  | AddTestDataRequest
+  | DeleteUserDataRequest
+  | DeleteReminderRequest
+  | GetReminderFromURLRequest;
+
+export interface RequestInterface {
+  operation: RequestOperation;
+}
+
+export interface AddTestDataRequest extends RequestInterface {
+  operation: RequestOperation.AddTestData;
+}
+
+export interface DeleteUserDataRequest extends RequestInterface {
+  operation: RequestOperation.DeleteUserData;
+}
+
+export interface DeleteReminderRequest extends RequestInterface {
+  operation: RequestOperation.DeleteReminder;
+  reminderId: number;
+}
+
+export interface GetReminderFromURLRequest extends RequestInterface {
+  operation: RequestOperation.GetReminderFromURL;
+  url: string;
+}
+
+export interface GetRelevantRemindersRequest extends RequestInterface {
+  operation: RequestOperation.GetRelevantReminders;
+  keywords: string[];
+}

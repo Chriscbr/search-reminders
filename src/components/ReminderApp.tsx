@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Reminder } from '../common';
+import { Reminder, RequestOperation } from '../common';
 import { chromeRuntimeSendMessage } from '../chrome_helpers';
 import ReminderList from './ReminderList';
 
@@ -34,7 +34,10 @@ export const ReminderApp = function(
     console.log(`Reminder with id ${reminderId} removed.`);
 
     // Update the state information in local storage
-    chromeRuntimeSendMessage({ operation: 'deleteReminder', index: index })
+    chromeRuntimeSendMessage({
+      operation: RequestOperation.DeleteReminder,
+      reminderId: reminderId,
+    })
       .then(response =>
         console.log(
           `deleteReminder message sent, recieved response: ${response}`,

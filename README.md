@@ -40,7 +40,8 @@ want to test changes, by clicking on the refresh button on
 ## TODOs
 - Rename things from "reminders" to "saved items" to generalize potential
 future uses
-- Add unit tests
+- Add unit tests (probably use Jest)
+- Add integration tests of some sort?
 - Add feature: on any webpage, click extension and click button to creating a
 reminder based on it
   - Make saved item descriptions editable
@@ -59,6 +60,10 @@ even remind the user if there is another page with a similar URL?
 - Consider adding some kind of different background, or accent of some kind
 using CSS to distinguish extension information from regular Google search
 results
+- Should automatically lowercase keywords that are added to a saved item
+- Consider combining ReminderMap, ReminderURLMap, and KeywordMap into some
+general object that can be referred to, since in most cases they act as a
+general entity where all should be updated together, etc.
 
 ## Project structure
 

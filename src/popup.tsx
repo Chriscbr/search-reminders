@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PopupView from './components/PopupView';
-import { Reminder } from './common';
+import { Reminder, RequestOperation } from './common';
 import { chromeRuntimeSendMessage, chromeTabsQuery } from './chrome_helpers';
 import 'typeface-roboto';
 
 const requestReminderFromURL = function(url: string): Promise<string> {
   console.log(`Sending request getReminderFromURL with url: ${url}.`);
   return chromeRuntimeSendMessage({
-    operation: 'getReminderFromURL',
+    operation: RequestOperation.GetReminderFromURL,
     url: url,
   }) as Promise<string>;
 };
