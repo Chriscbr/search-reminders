@@ -1,23 +1,33 @@
 {
-    "compilerOptions": {
-        "module": "es6",
-        "target": "es6",
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "strictPropertyInitialization": true,
-        "noImplicitThis": true,
-        "noImplicitReturns": true,
-        "alwaysStrict": true,
-        "sourceMap": false,
-        "jsx": "react",
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "esModuleInterop": true,
-        "rootDir": "src",
-        "outDir": "dist/js",
-        "noEmitOnError": true,
-        "typeRoots": [ "node_modules/@types" ],
-        "lib": [ "dom", "es6", "dom.iterable", "es2018.promise" ]
-    }
+  "compilerOptions": {
+    "alwaysStrict": true,
+    /** Necessary to allow some imports such as testData.json */
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "lib": [
+      "dom",
+      "es6",
+      "es2018.promise"
+    ],
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "dist/js",
+    "resolveJsonModule": true,
+    "rootDir": "src",
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "es6",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+  }
 }

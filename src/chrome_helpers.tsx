@@ -2,8 +2,8 @@ const promisify = function(
   fn: Function,
   ...params: unknown[]
 ): Promise<unknown> {
-  return new Promise((resolve, reject): void => {
-    return fn.apply(
+  return new Promise((resolve, reject): void =>
+    fn.apply(
       null,
       params.concat((result: unknown) => {
         if (chrome.runtime.lastError) {
@@ -11,8 +11,8 @@ const promisify = function(
         }
         return resolve(result);
       }),
-    );
-  });
+    ),
+  );
 };
 
 export const chromeRuntimeSendMessage = function(

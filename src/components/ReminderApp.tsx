@@ -14,7 +14,7 @@ export const ReminderApp = function(
   const [reminders, setReminders] = useState(props.initReminders);
 
   const deleteButtonHandler = (
-    event: React.MouseEvent,
+    _event: React.MouseEvent,
     reminderId: number,
   ): void => {
     // Update the state with a copy of the list with the reminder removed
