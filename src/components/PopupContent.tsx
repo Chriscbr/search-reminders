@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import { UnreachableCaseError } from '../utils';
 
 const useStyles = makeStyles({
   box: {
@@ -49,6 +50,7 @@ const useStyles = makeStyles({
 });
 
 /**
+ * Description of popup content modes:
  * empty - The webpage is not recognized as an existing reminder/saved item.
  *   The popup shows a button to the user which will let them create a reminder.
  * editing - The webpage reminder data is shown, with all fields editable
@@ -204,10 +206,18 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     saveReminder,
     deleteReminder,
   } = props;
+
+  // State variables for values that are displayed in the popup
   const [title, setTitle] = useState(initTitle);
   const [description, setDescription] = useState(initDescription);
   const [keywords, setKeywords] = useState(initKeywords);
   const [mode, setMode] = useState(initMode);
+
+  // State variables for temporarily retaining the original
+  // values during editing mode (in case the user selects 'exit')
+  const [tempTitle, setTempTitle] = useState(initTitle);
+  const [tempDescription, setTempDescription] = useState(initDescription);
+  const [tempKeywords, setTempKeywords] = useState(initKeywords);
   const classes = useStyles();
 
   const handleChangeTitle = (
@@ -255,14 +265,19 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
       );
     } else {
       saveReminder(title, description, keywords);
+      setTempTitle(title);
+      setTempDescription(description);
+      setTempKeywords(keywords);
+      setMode('saved');
     }
-    setMode('saved');
   };
 
   const handleExitButton = (
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void => {
-    // TODO: add mechanism for reloading content from saved data
+    setTitle(tempTitle);
+    setDescription(tempDescription);
+    setKeywords(tempKeywords);
     setMode('saved');
   };
 
@@ -275,8 +290,6 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const handleDeleteButton = (
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void => {
-    // Note: deleting the reminder could fail here, but for UI sake we will
-    // just render it being deleted anyway.
     if (deleteReminder === undefined) {
       console.error(
         'Delete reminder was called even though there is no reminder associated with this page!',
@@ -335,8 +348,8 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
         );
       }
     default:
-      console.error(`Mode '${mode}' not recognized, defaulting to 'empty'.`);
-      return renderEmptyMode(classes);
+      console.error(`Mode '${mode}' not recognized.`);
+      throw new UnreachableCaseError(mode);
   }
 };
 

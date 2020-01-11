@@ -297,6 +297,9 @@ export type UserDataJSON = {
   currentId: number;
 };
 
+// If using this enum (which gets compiled down to inlined numbers) makes
+// things difficult to debug, consider removing 'const' or just using
+// a string literal union
 export const enum RequestOperation {
   GetRelevantReminders,
   AddTestData,
@@ -306,6 +309,8 @@ export const enum RequestOperation {
   GetReminderFromURL,
 }
 
+// This pattern is known as the 'discriminated union';
+// see https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions
 export type Request =
   | GetRelevantRemindersRequest
   | AddTestDataRequest
