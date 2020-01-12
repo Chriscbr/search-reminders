@@ -23,12 +23,29 @@ export const KeywordChipInput = function(
   const { keywords, disabled, handleAddKeyword, handleDeleteKeyword } = props;
   const classes = useStyles();
 
-  return (
+  // Most of the attributes between these two cases are the same, but AFAIK the
+  // components need to be separated to satisfy type checking, since
+  // variant={disabled ? 'outlined' : 'filled} is not allowed.
+  return disabled ? (
     <ChipInput
       value={keywords}
       onAdd={handleAddKeyword}
       onDelete={handleDeleteKeyword}
-      variant={disabled ? 'outlined' : 'filled'}
+      variant={'outlined'}
+      label="Keywords"
+      disabled={disabled}
+      classes={{ chip: classes.chip }}
+      fullWidth
+      chipRenderer={({ value, className }, key): JSX.Element => (
+        <Chip key={key} className={className} size="small" label={value} />
+      )}
+    />
+  ) : (
+    <ChipInput
+      value={keywords}
+      onAdd={handleAddKeyword}
+      onDelete={handleDeleteKeyword}
+      variant={'filled'}
       label="Keywords"
       disabled={disabled}
       classes={{ chip: classes.chip }}
@@ -38,7 +55,7 @@ export const KeywordChipInput = function(
           key={key}
           className={className}
           size="small"
-          onDelete={disabled ? undefined : handleDelete}
+          onDelete={handleDelete}
           label={value}
         />
       )}
