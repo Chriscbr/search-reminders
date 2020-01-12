@@ -32,6 +32,11 @@ const getKeywordsFromQuery = function(query: string): string[] {
     .split(' ');
 };
 
+/**
+ * Sends a message to the `background.js` script to obtain a list of relevant
+ * Reminders given a sequence of keywords.
+ * @param keywords a sequence of keywords
+ */
 const requestRelevantReminders = function(
   keywords: string[],
 ): Promise<Reminder[]> {
@@ -49,7 +54,8 @@ const requestRelevantReminders = function(
 };
 
 /**
- * Creates the div which app content will be inserted to.
+ * Creates and returns the div which app content will be inserted to on the
+ * Google search results page.
  *
  * The div is inserted at the beginning of the search results, right before the
  * div called "search" on Google.
@@ -69,18 +75,34 @@ const setupInjectionPoint = function(): HTMLDivElement {
   return injectionPoint;
 };
 
-const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
-console.log(`Keywords found: ${keywords}`);
-requestRelevantReminders(keywords)
-  .then(reminders => {
-    console.log('Reminder data received:', reminders);
+const injectRemindersList = function(): void {
+  const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
+  console.log(`Keywords found: ${keywords}`);
 
-    const injectionPoint = setupInjectionPoint();
-    const reminderApp = <ReminderApp initReminders={reminders} />;
-    ReactDOM.render(reminderApp, injectionPoint, () =>
-      console.log('ReminderApp rendered.'),
-    );
-  })
-  .catch(err => {
-    console.log(err);
-  });
+  requestRelevantReminders(keywords)
+    .then(reminders => {
+      console.log('Reminder data received:', reminders);
+
+      const injectionPoint = setupInjectionPoint();
+      const reminderApp = <ReminderApp initReminders={reminders} />;
+      ReactDOM.render(reminderApp, injectionPoint, () =>
+        console.log('ReminderApp rendered.'),
+      );
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+const isGoogleSearchPage = function(): boolean {
+  const hostname: string = document.location.hostname;
+  const pathname: string = document.location.pathname;
+
+  return hostname === 'www.google.com' && pathname === '/search';
+};
+
+// Main driver code
+console.log('Content script loaded.');
+if (isGoogleSearchPage()) {
+  injectRemindersList();
+}

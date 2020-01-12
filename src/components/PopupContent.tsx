@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import { PageMetadata } from '../common';
 import { UnreachableCaseError } from '../utils';
 
 const useStyles = makeStyles({
@@ -47,6 +48,9 @@ const useStyles = makeStyles({
   button: {
     margin: '8px',
   },
+  createButton: {
+    marginTop: '8px',
+  },
 });
 
 /**
@@ -65,7 +69,8 @@ type PopupContentProps = {
   initDescription?: string;
   initKeywords?: string[];
   initMode: PopupContentMode;
-  saveReminder?: (
+  pageMetadata: PageMetadata;
+  saveReminder: (
     title: string,
     description: string,
     keywords: string[],
@@ -74,10 +79,29 @@ type PopupContentProps = {
 };
 
 // TODO: add functionality to add page to reminders
-const renderEmptyMode = function(classes: Record<string, string>): JSX.Element {
+const renderEmptyMode = function(
+  handleCreateButton: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void,
+  classes: Record<string, string>,
+): JSX.Element {
   return (
     <Box className={classes.box}>
-      <Typography component="p">This page is not saved.</Typography>
+      <Typography align="center" component="p">
+        This page is not currently saved.
+      </Typography>
+      <Grid
+        container
+        spacing={0}
+        direction="column"
+        alignItems="center"
+        justify="center"
+        className={classes.createButton}
+      >
+        <Button variant="contained" onClick={handleCreateButton}>
+          Create a Reminder
+        </Button>
+      </Grid>
     </Box>
   );
 };
@@ -203,6 +227,7 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     initDescription,
     initKeywords,
     initMode,
+    pageMetadata,
     saveReminder,
     deleteReminder,
   } = props;
@@ -219,6 +244,15 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const [tempDescription, setTempDescription] = useState(initDescription);
   const [tempKeywords, setTempKeywords] = useState(initKeywords);
   const classes = useStyles();
+
+  const handleCreateButton = (
+    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): void => {
+    setTitle(pageMetadata.title);
+    setDescription(pageMetadata.description);
+    setKeywords(pageMetadata.keywords);
+    setMode('editing');
+  };
 
   const handleChangeTitle = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -255,13 +289,12 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void => {
     if (
-      saveReminder === undefined ||
       title === undefined ||
       description === undefined ||
       keywords === undefined
     ) {
       console.error(
-        'Save reminder called even though there is no reminder associated on this page!',
+        'Unable to save reminder, title, description, or keywords fields are undefined.',
       );
     } else {
       saveReminder(title, description, keywords);
@@ -275,10 +308,21 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const handleExitButton = (
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void => {
-    setTitle(tempTitle);
-    setDescription(tempDescription);
-    setKeywords(tempKeywords);
-    setMode('saved');
+    // Two cases: the user is exiting after attempting to create a reminder
+    // (first branch), and the user is exiting after attempting to edit the
+    // reminder (second branch).
+    if (
+      tempTitle === undefined ||
+      tempDescription === undefined ||
+      tempKeywords === undefined
+    ) {
+      setMode('empty');
+    } else {
+      setTitle(tempTitle);
+      setDescription(tempDescription);
+      setKeywords(tempKeywords);
+      setMode('saved');
+    }
   };
 
   const handleEditButton = (
@@ -302,7 +346,7 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
 
   switch (mode) {
     case 'empty':
-      return renderEmptyMode(classes);
+      return renderEmptyMode(handleCreateButton, classes);
     case 'editing':
       if (
         title === undefined ||

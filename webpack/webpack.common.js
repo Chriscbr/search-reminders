@@ -7,7 +7,8 @@ module.exports = {
         popup: path.join(__dirname, srcDir + 'popup.tsx'),
         options: path.join(__dirname, srcDir + 'options.tsx'),
         background: path.join(__dirname, srcDir + 'background.tsx'),
-        content_script: path.join(__dirname, srcDir + 'content_script.tsx')
+        content_script: path.join(__dirname, srcDir + 'content_script.tsx'),
+        get_metadata: path.join(__dirname, srcDir + 'get_metadata.tsx')
     },
     output: {
         path: path.join(__dirname, '../dist/js'),
@@ -47,8 +48,8 @@ module.exports = {
     plugins: [
         new CopyPlugin([
             { from: '.', to: '../' }
-          ],
-          {context: 'public' }
+        ],
+            { context: 'public' }
         ),
     ],
     watchOptions: {

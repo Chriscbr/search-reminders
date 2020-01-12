@@ -64,6 +64,22 @@ results
 - Consider combining ReminderMap, ReminderURLMap, and KeywordMap into some
 general object that can be referred to, since in most cases they act as a
 general entity where all should be updated together, etc.
+- Add URL similarity feature so when trying to add a change, the popup
+shows if there are already pages that have been saved with a similar URL
+(in case the URL happens to be changing?) - or perhaps an option when adding
+a URL to remove the URL parameters if desired
+(see https://stackoverflow.com/questions/6257463/how-to-get-the-url-without-any-parameters-in-javascript)
+- Update main dependencies (react, material-ui, etc.)
+- Add support for other browsers (start with Firefox?)
+- Fix UI bug with 'Keywords' in popup
+- Decide on uniform way to handle keywords/tags? Can these be multiple words?
+Possibly should modify get_metadata script to automatically separate phrases
+into individual words. Or allow phrases (requires more logic).
+- `get_metadata.js` may get injected to a page multiple times if the user
+switches tabs multiple times. Is this an issue (or can this be easily fixed)?
+Could lead to problems down the road, not sure.
+- BUG: `get_metadata.js` currently gets injected when the tab is 'switched' to,
+but not when the page is created or refreshed.
 
 ## Project structure
 
@@ -89,6 +105,7 @@ general entity where all should be updated together, etc.
 │   ├── chrome_helpers.tsx  - Wrapper functions for Chrome APIs
 │   ├── common.tsx          - Code that is shared between modules
 │   ├── content_script.tsx  - Code that gets injected to google.com/search
+│   ├── get_metadata.tsx    - Code that gets injected to all pages
 │   ├── options.tsx         - Code that runs on the options page
 │   ├── popup.tsx           - Code that runs on the popup
 │   ├── testData.json       - Test data
@@ -106,6 +123,11 @@ script which updates and retrieves user data from the
 `content_script.js`) communicate with `background.js` via
 [message passing](https://developer.chrome.com/extensions/messaging) in order
 to update or receive data.
+- To obtain metadata about the page (such as the page's title, and its
+description or tags), `get_metadata.js` is injected to each page when the
+tab is selected. This allows `popup.js` to send a message to content scripts
+on the tab to get the metadata information if the user wishes to create a
+reminder.
 
 ## Debugging notes
 To see what's inside Chrome local storage for the app, open the developer

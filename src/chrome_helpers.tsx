@@ -15,6 +15,24 @@ const promisify = function(
   );
 };
 
+export const chromeRuntimeSendMessageToContentScript = function(
+  message: object,
+): Promise<unknown> {
+  return new Promise((resolve, reject): void => {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      if (tabs[0].id === undefined) {
+        return reject('Tab id is undefined.');
+      }
+      chrome.tabs.sendMessage(tabs[0].id, message, function(response) {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        return resolve(response);
+      });
+    });
+  });
+};
+
 export const chromeRuntimeSendMessage = function(
   message: object,
 ): Promise<unknown> {

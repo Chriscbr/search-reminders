@@ -123,21 +123,20 @@ export class ReminderStore {
 
   update(
     id: number,
+    url: string,
     title: string,
     description: string,
     keywords: string[],
-    url?: string,
-  ): void {
+  ): Reminder {
     const reminder = this._data.get(id);
     if (reminder === undefined) {
       throw new Error(`Reminder ID not found in ReminderStore: ${id}`);
     }
+    reminder.url = url;
     reminder.title = title;
     reminder.description = description;
     reminder.keywords = keywords;
-    if (url !== undefined) {
-      reminder.url = url;
-    }
+    return reminder;
   }
 
   remove(reminderId: number): Reminder {
@@ -297,6 +296,13 @@ export type UserDataJSON = {
   currentId: number;
 };
 
+export type PageMetadata = {
+  title: string;
+  url: string;
+  description: string;
+  keywords: string[];
+};
+
 // If using this enum (which gets compiled down to inlined numbers) makes
 // things difficult to debug, consider removing 'const' or just using
 // a string literal union
@@ -304,9 +310,10 @@ export const enum RequestOperation {
   GetRelevantReminders,
   AddTestData,
   DeleteUserData,
-  UpdateReminder,
+  SaveReminder,
   DeleteReminder,
   GetReminderFromURL,
+  GetPageMetadata,
 }
 
 // This pattern is known as the 'discriminated union';
@@ -315,9 +322,10 @@ export type Request =
   | GetRelevantRemindersRequest
   | AddTestDataRequest
   | DeleteUserDataRequest
-  | UpdateReminderRequest
+  | SaveReminderRequest
   | DeleteReminderRequest
-  | GetReminderFromURLRequest;
+  | GetReminderFromURLRequest
+  | GetPageMetadataRequest;
 
 export interface RequestInterface {
   operation: RequestOperation;
@@ -331,9 +339,12 @@ export interface DeleteUserDataRequest extends RequestInterface {
   operation: RequestOperation.DeleteUserData;
 }
 
-export interface UpdateReminderRequest extends RequestInterface {
-  operation: RequestOperation.UpdateReminder;
-  reminderId: number;
+// It's possible we could make some of these fields optional, it just depends
+// on the needs of the API really
+export interface SaveReminderRequest extends RequestInterface {
+  operation: RequestOperation.SaveReminder;
+  reminderId: number | null;
+  url: string;
   title: string;
   description: string;
   keywords: string[];
@@ -352,4 +363,8 @@ export interface GetReminderFromURLRequest extends RequestInterface {
 export interface GetRelevantRemindersRequest extends RequestInterface {
   operation: RequestOperation.GetRelevantReminders;
   keywords: string[];
+}
+
+export interface GetPageMetadataRequest extends RequestInterface {
+  operation: RequestOperation.GetPageMetadata;
 }

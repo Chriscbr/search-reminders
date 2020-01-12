@@ -6,7 +6,7 @@ import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import PopupContent from './PopupContent';
 import PopupNavbar from './PopupNavbar';
-import { Reminder, RequestOperation } from '../common';
+import { Reminder, RequestOperation, PageMetadata } from '../common';
 import { chromeRuntimeSendMessage } from '../chrome_helpers';
 
 const useStyles = makeStyles({
@@ -19,15 +19,22 @@ const useStyles = makeStyles({
   title: {
     fontSize: '1.25rem',
   },
+  innerBox: {
+    padding: '10px',
+  },
 });
 
 type PopupViewProps = {
   getCurrentPageReminder: () => Promise<Reminder | null>;
+  getPageMetadata: () => Promise<PageMetadata | null>;
 };
 
 export const PopupView = function(props: PopupViewProps): JSX.Element {
   const classes = useStyles();
-  const { getCurrentPageReminder } = props;
+  const { getCurrentPageReminder, getPageMetadata } = props;
+
+  const requests: () => Promise<[Reminder | null, PageMetadata | null]> = () =>
+    Promise.all([getCurrentPageReminder(), getPageMetadata()] as const);
 
   return (
     <Box className={classes.box}>
@@ -35,43 +42,61 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
         <Typography className={classes.title}>Search Reminders</Typography>
       </Box>
       <Divider variant="fullWidth" />
-      <Async promiseFn={getCurrentPageReminder}>
+      <Async promiseFn={requests}>
         <Async.Loading>
           <Typography component="p">Loading...</Typography>
         </Async.Loading>
         <Async.Fulfilled>
-          {(data: Reminder | null): JSX.Element => {
-            if (data === null) {
-              return <PopupContent initMode="empty" />;
-            } else {
-              const saveReminder = (
-                title: string,
-                description: string,
-                keywords: string[],
-              ): void => {
-                chromeRuntimeSendMessage({
-                  operation: RequestOperation.UpdateReminder,
-                  reminderId: data.id,
-                  title: title,
-                  description: description,
-                  keywords: keywords,
-                })
-                  .then(response =>
-                    console.log(
-                      `updateReminder message sent, recieved response: ${response}`,
-                    ),
-                  )
-                  .catch(error =>
-                    console.log(
-                      `Error sending updateReminder message: ${error}`,
-                    ),
-                  );
-              };
+          {([reminder, metadata]: [
+            Reminder | null,
+            PageMetadata,
+          ]): JSX.Element => {
+            if (metadata === null) {
+              return (
+                <Box className={classes.innerBox}>
+                  <Typography align="center" component="p">
+                    An error has occurred. Try refreshing the page.
+                  </Typography>
+                </Box>
+              );
+            }
 
+            const saveReminder = (
+              title: string,
+              description: string,
+              keywords: string[],
+            ): void => {
+              chromeRuntimeSendMessage({
+                operation: RequestOperation.SaveReminder,
+                reminderId: reminder?.id ?? null,
+                url: metadata.url,
+                title: title,
+                description: description,
+                keywords: keywords,
+              })
+                .then(response =>
+                  console.log(
+                    `saveReminder message sent, recieved response: ${response}`,
+                  ),
+                )
+                .catch(error =>
+                  console.log(`Error sending saveReminder message: ${error}`),
+                );
+            };
+
+            if (reminder === null) {
+              return (
+                <PopupContent
+                  initMode="empty"
+                  pageMetadata={metadata}
+                  saveReminder={saveReminder}
+                />
+              );
+            } else {
               const deleteReminder = (): void => {
                 chromeRuntimeSendMessage({
                   operation: RequestOperation.DeleteReminder,
-                  reminderId: data.id,
+                  reminderId: reminder.id,
                 })
                   .then(response =>
                     console.log(
@@ -87,10 +112,11 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
 
               return (
                 <PopupContent
-                  initTitle={data.title}
-                  initDescription={data.description}
-                  initKeywords={data.keywords}
+                  initTitle={reminder.title}
+                  initDescription={reminder.description}
+                  initKeywords={reminder.keywords}
                   initMode="saved"
+                  pageMetadata={metadata}
                   saveReminder={saveReminder}
                   deleteReminder={deleteReminder}
                 />

@@ -5,16 +5,22 @@
   "permissions": [
     "activeTab",
     "storage",
-    "https://www.google.com/search*"
+    "<all_urls>"
   ],
   "background": {
-    "scripts": ["js/background.js"],
+    "scripts": [
+      "js/background.js"
+    ],
     "persistent": false
   },
   "content_scripts": [
     {
-      "matches": ["https://www.google.com/search*"],
-      "js": ["js/content_script.js"]
+      "matches": [
+        "https://www.google.com/search*"
+      ],
+      "js": [
+        "js/content_script.js"
+      ]
     }
   ],
   "options_page": "options.html",

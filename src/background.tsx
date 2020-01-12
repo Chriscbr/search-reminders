@@ -11,7 +11,7 @@ import {
   DeleteReminderRequest,
   GetReminderFromURLRequest,
   GetRelevantRemindersRequest,
-  UpdateReminderRequest,
+  SaveReminderRequest,
 } from './common';
 import { UnreachableCaseError } from './utils';
 import {
@@ -64,7 +64,7 @@ const loadDataFromStorage = function(): Promise<UserData> {
     });
 };
 
-const initializeData = function(
+const addReminders = function(
   reminders: Reminder[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
@@ -77,7 +77,7 @@ const initializeData = function(
   });
 };
 
-const initializeDataWithoutIds = function(
+const addRemindersWithoutIds = function(
   testData: ReminderParams[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
@@ -91,34 +91,33 @@ const initializeDataWithoutIds = function(
 };
 
 const updateReminder = function(
-  reminderId: number,
-  reminderTitle: string,
-  reminderDescription: string,
-  reminderKeywords: string[],
+  id: number,
+  url: string,
+  title: string,
+  description: string,
+  keywords: string[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
+  reminderURLMap: ReminderURLMap,
 ): void {
   // First, calculate the 'difference' between the current and updated keywords
-  const reminder = reminderStore.getReminder(reminderId);
+  let reminder = reminderStore.getReminder(id);
   if (reminder === undefined) {
-    throw new Error(`Reminder ID not found in reminderStore: ${reminderId}`);
+    throw new Error(`Reminder ID not found in reminderStore: ${id}`);
   }
   const priorKeywords = reminder.keywords;
-  const addedKeywords = reminderKeywords.filter(
+  const addedKeywords = keywords.filter(
     keyword => priorKeywords.indexOf(keyword) === -1,
   );
   const removedKeywords = priorKeywords.filter(
-    keyword => reminderKeywords.indexOf(keyword) === -1,
+    keyword => keywords.indexOf(keyword) === -1,
   );
 
-  // Update the reminderStore and keywordMap respectively
-  reminderStore.update(
-    reminderId,
-    reminderTitle,
-    reminderDescription,
-    reminderKeywords,
-  );
-  keywordMap.update(reminderId, addedKeywords, removedKeywords);
+  // Update all data structures
+  reminderURLMap.remove(reminder);
+  reminder = reminderStore.update(id, url, title, description, keywords);
+  keywordMap.update(id, addedKeywords, removedKeywords);
+  reminderURLMap.add(reminder);
 };
 
 const deleteReminder = function(
@@ -216,7 +215,7 @@ const handleAddTestData = function(
   reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
 ): void {
-  initializeDataWithoutIds(testData, reminderStore, keywordMap, reminderURLMap);
+  addRemindersWithoutIds(testData, reminderStore, keywordMap, reminderURLMap);
   saveLocalDataToStorage(reminderStore)
     .then(() => {
       console.log('Saved data to sync storage.');
@@ -261,30 +260,49 @@ const handleDeleteUserData = function(
 };
 
 /**
- * Handles a request to update a Reminder with an associated ID.
- * Updates the reminder in the `reminderStore` and `keywordMap` (as this API
- * does not currently allow changing a reminder's URL), and then saves the
- * changes to local storage.
+ * Handles a request to save a Reminder with an associated ID.
+ * If the ID in the request is `null`, then a new Reminder must be created.
+ * Otherwise, the existing Reminder information will be updated.
+ * In both cases, the changes are afterwards saved to local storage.
  *
  * @param request the request containing the information to update with
  * @param reminderStore reference to reminder store
  * @param keywordMap reference to keyword map
  * @param sendResponse callback function for sending the response message
  */
-const handleUpdateReminder = function(
-  request: UpdateReminderRequest,
+const handleSaveReminder = function(
+  request: SaveReminderRequest,
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
+  reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
 ): void {
-  updateReminder(
-    request.reminderId,
-    request.title,
-    request.description,
-    request.keywords,
-    reminderStore,
-    keywordMap,
-  );
+  if (request.reminderId === null) {
+    addRemindersWithoutIds(
+      [
+        {
+          url: request.url,
+          title: request.title,
+          description: request.description,
+          keywords: request.keywords,
+        },
+      ],
+      reminderStore,
+      keywordMap,
+      reminderURLMap,
+    );
+  } else {
+    updateReminder(
+      request.reminderId,
+      request.url,
+      request.title,
+      request.description,
+      request.keywords,
+      reminderStore,
+      keywordMap,
+      reminderURLMap,
+    );
+  }
   saveLocalDataToStorage(reminderStore)
     .then(() => {
       console.log('Updated item and updated sync storage.');
@@ -419,8 +437,14 @@ const addMessageListener = function(
           sendResponse,
         );
         break;
-      case RequestOperation.UpdateReminder:
-        handleUpdateReminder(request, reminderStore, keywordMap, sendResponse);
+      case RequestOperation.SaveReminder:
+        handleSaveReminder(
+          request,
+          reminderStore,
+          keywordMap,
+          reminderURLMap,
+          sendResponse,
+        );
         break;
       case RequestOperation.DeleteReminder:
         handleDeleteReminder(
@@ -438,6 +462,9 @@ const addMessageListener = function(
           reminderURLMap,
           sendResponse,
         );
+        break;
+      case RequestOperation.GetPageMetadata:
+        console.log("Received operation  'GetPageMetadata'. Ignoring.");
         break;
       default:
         sendResponse('Error, invalid request operation received.');
@@ -477,6 +504,17 @@ loadDataFromStorage().then((data: UserData) => {
   // Map<string (url), number (id)>
   const reminderURLMap = new ReminderURLMap();
 
-  initializeData(reminders, reminderStore, keywordMap, reminderURLMap);
+  addReminders(reminders, reminderStore, keywordMap, reminderURLMap);
   addMessageListener(reminderStore, keywordMap, reminderURLMap, testData);
+
+  chrome.tabs.onActivated.addListener(function(_details) {
+    chrome.tabs.executeScript({ file: 'js/get_metadata.js' }, () => {
+      if (chrome.runtime.lastError) {
+        console.log(
+          `Whoops, an error occurred trying to execute get_metadata.js.`,
+        );
+        console.log(chrome.runtime.lastError);
+      }
+    });
+  });
 });
