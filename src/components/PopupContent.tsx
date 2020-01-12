@@ -270,7 +270,7 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     if (keywords === undefined) {
       console.error('Unable to add keyword, keywords is undefined.');
     } else {
-      setKeywords([...keywords, keyword]);
+      setKeywords([...keywords, keyword.toLocaleLowerCase()]);
     }
   };
 
