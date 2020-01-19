@@ -72,8 +72,9 @@ into individual words. Or allow phrases (requires more logic).
 - `get_metadata.js` may get injected to a page multiple times if the user
 switches tabs multiple times. Is this an issue (or can this be easily fixed)?
 Could lead to problems down the road, not sure.
-- BUG: `get_metadata.js` currently gets injected when the tab is 'switched' to,
-but not when the page is created or refreshed.
+- BUG: If you open the popup too soon after opening a new page, an error will
+occur, since `get_metadata.js` will not have started executing yet.
+Possible workarounds: ???
 - Sort TODOs into high/mid/low priority
 
 ## Project structure

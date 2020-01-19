@@ -52,7 +52,7 @@ const getCurrentPageReminder = function(): Promise<Reminder | null> {
  * responds with a `PageMetadata` object.
  */
 const getPageMetadata = function(): Promise<PageMetadata | null> {
-  console.log(`Sending request getPageMetadata to content script.`);
+  console.log(`Sending request getPageMetadata to content scripts.`);
   return chromeRuntimeSendMessageToContentScript({
     operation: RequestOperation.GetPageMetadata,
   })
@@ -62,7 +62,8 @@ const getPageMetadata = function(): Promise<PageMetadata | null> {
       return response as PageMetadata;
     })
     .catch(error => {
-      console.error(`Error received: ${error}`);
+      console.error(`Error received:`);
+      console.error(error);
       return null;
     });
 };

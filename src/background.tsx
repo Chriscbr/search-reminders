@@ -507,7 +507,7 @@ loadDataFromStorage().then((data: UserData) => {
   addReminders(reminders, reminderStore, keywordMap, reminderURLMap);
   addMessageListener(reminderStore, keywordMap, reminderURLMap, testData);
 
-  chrome.tabs.onActivated.addListener(function(_details) {
+  const runGetMetadataScript = (): void => {
     chrome.tabs.executeScript({ file: 'js/get_metadata.js' }, () => {
       if (chrome.runtime.lastError) {
         console.log(
@@ -516,5 +516,20 @@ loadDataFromStorage().then((data: UserData) => {
         console.log(chrome.runtime.lastError);
       }
     });
+  };
+
+  chrome.tabs.onActivated.addListener(function(_details) {
+    console.log('onActivated listener injecting get_metadata script.');
+    runGetMetadataScript();
+  });
+  chrome.tabs.onUpdated.addListener(function(
+    _tabId: number,
+    changeInfo: chrome.tabs.TabChangeInfo,
+    _tab: chrome.tabs.Tab,
+  ) {
+    if (changeInfo.status === 'complete') {
+      console.log('onUpdated listener injecting get_metadata script.');
+      runGetMetadataScript();
+    }
   });
 });

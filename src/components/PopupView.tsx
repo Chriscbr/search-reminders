@@ -55,7 +55,7 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
               return (
                 <Box className={classes.innerBox}>
                   <Typography align="center" component="p">
-                    An error has occurred. Try refreshing the page.
+                    An error has occurred.
                   </Typography>
                 </Box>
               );

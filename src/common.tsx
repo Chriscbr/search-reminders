@@ -303,17 +303,15 @@ export type PageMetadata = {
   keywords: string[];
 };
 
-// If using this enum (which gets compiled down to inlined numbers) makes
-// things difficult to debug, consider removing 'const' or just using
-// a string literal union
+// TODO: Is this any different from just a TypeScript string literal union type?
 export const enum RequestOperation {
-  GetRelevantReminders,
-  AddTestData,
-  DeleteUserData,
-  SaveReminder,
-  DeleteReminder,
-  GetReminderFromURL,
-  GetPageMetadata,
+  GetRelevantReminders = 'GetRelevantReminders',
+  AddTestData = 'AddTestData',
+  DeleteUserData = 'DeleteUserData',
+  SaveReminder = 'SaveReminder',
+  DeleteReminder = 'DeleteReminder',
+  GetReminderFromURL = 'GetReminderFromURL',
+  GetPageMetadata = 'GetPageMetadata',
 }
 
 // This pattern is known as the 'discriminated union';
