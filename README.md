@@ -38,19 +38,17 @@ want to test changes, by clicking on the refresh button on
 
 
 ## TODOs
+- [High]: Add ability on options page to see list of saved pages
 - [Med]: Rename things from "reminders" to "saved items" to generalize potential
 future uses
 - [Med]: Add unit tests (probably use Jest)
 - [Med]: Add integration tests of some sort?
-- [High]: Add ability on options page to see list of saved pages
 - [Med]: Support different search engines, like DuckDuckGo
 - [Low]: Add logging infrastructure? Enable/disable logging with a setting?
 - [Low]: Read about Redux, and evaluate if it would be useful for this project
 - [Med]: Update extension icons
 - [Low]: Look into code splitting to improve bundle sizes?
-<https://reactjs.org/docs/code-splitting.html>
-- [High]: Add "Hide" or "Close" button to the right side of
-"Pages you have saved"
+(see https://reactjs.org/docs/code-splitting.html)
 - Consider adding some kind of different background, or accent of some kind
 using CSS to distinguish extension information from regular Google search
 results
@@ -75,6 +73,8 @@ Could lead to problems down the road, not sure.
 - [Low]: If you open the popup too soon after opening a new page, an error will
 occur, since `get_metadata.js` will not have started executing yet.
 Possible workarounds: ???
+- [Med]: Hide reminder list on Google search results page if you are not
+on the first page of results
 
 ## Project structure
 
