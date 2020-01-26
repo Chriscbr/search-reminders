@@ -82,12 +82,15 @@ const addRemindersWithoutIds = function(
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
-): void {
+): number[] {
+  const reminderIds: number[] = []; // keep track of the reminderIds generated
   testData.forEach((params, _index) => {
     const reminder = reminderStore.create(params);
     keywordMap.add(reminder);
     reminderURLMap.add(reminder);
+    reminderIds.push(reminder.id);
   });
+  return reminderIds;
 };
 
 const updateReminder = function(
@@ -277,8 +280,9 @@ const handleSaveReminder = function(
   reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
 ): void {
+  let reminderId: number;
   if (request.reminderId === null) {
-    addRemindersWithoutIds(
+    const reminderIds = addRemindersWithoutIds(
       [
         {
           url: request.url,
@@ -291,6 +295,7 @@ const handleSaveReminder = function(
       keywordMap,
       reminderURLMap,
     );
+    reminderId = reminderIds[0];
   } else {
     updateReminder(
       request.reminderId,
@@ -302,12 +307,13 @@ const handleSaveReminder = function(
       keywordMap,
       reminderURLMap,
     );
+    reminderId = request.reminderId;
   }
   saveLocalDataToStorage(reminderStore)
     .then(() => {
       console.log('Updated item and updated sync storage.');
       console.log('Sending response to updateReminder: SUCCESS');
-      sendResponse('SUCCESS');
+      sendResponse(reminderId.toString());
     })
     .catch(error => {
       console.error(`Error occured updating sync storage: ${error}`);

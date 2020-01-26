@@ -6,8 +6,7 @@ import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import PopupContent from './PopupContent';
 import PopupNavbar from './PopupNavbar';
-import { Reminder, RequestOperation, PageMetadata } from '../common';
-import { chromeRuntimeSendMessage } from '../chrome_helpers';
+import { Reminder, PageMetadata } from '../common';
 
 const useStyles = makeStyles({
   box: {
@@ -61,64 +60,23 @@ export const PopupView = function(props: PopupViewProps): JSX.Element {
               );
             }
 
-            const saveReminder = (
-              title: string,
-              description: string,
-              keywords: string[],
-            ): void => {
-              chromeRuntimeSendMessage({
-                operation: RequestOperation.SaveReminder,
-                reminderId: reminder?.id ?? null,
-                url: metadata.url,
-                title: title,
-                description: description,
-                keywords: keywords,
-              })
-                .then(response =>
-                  console.log(
-                    `saveReminder message sent, recieved response: ${response}`,
-                  ),
-                )
-                .catch(error =>
-                  console.log(`Error sending saveReminder message: ${error}`),
-                );
-            };
-
             if (reminder === null) {
               return (
                 <PopupContent
+                  initReminderId={null}
                   initMode="empty"
                   pageMetadata={metadata}
-                  saveReminder={saveReminder}
                 />
               );
             } else {
-              const deleteReminder = (): void => {
-                chromeRuntimeSendMessage({
-                  operation: RequestOperation.DeleteReminder,
-                  reminderId: reminder.id,
-                })
-                  .then(response =>
-                    console.log(
-                      `deleteReminder message sent, recieved response: ${response}`,
-                    ),
-                  )
-                  .catch(error =>
-                    console.log(
-                      `Error sending deleteReminder message: ${error}`,
-                    ),
-                  );
-              };
-
               return (
                 <PopupContent
                   initTitle={reminder.title}
                   initDescription={reminder.description}
                   initKeywords={reminder.keywords}
+                  initReminderId={reminder.id}
                   initMode="saved"
                   pageMetadata={metadata}
-                  saveReminder={saveReminder}
-                  deleteReminder={deleteReminder}
                 />
               );
             }

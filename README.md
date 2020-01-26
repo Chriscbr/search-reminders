@@ -38,44 +38,43 @@ want to test changes, by clicking on the refresh button on
 
 
 ## TODOs
-- Rename things from "reminders" to "saved items" to generalize potential
+- [Med]: Rename things from "reminders" to "saved items" to generalize potential
 future uses
-- Add unit tests (probably use Jest)
-- Add integration tests of some sort?
-- Add ability on options page to see list of saved pages
-- Handle duplicate webpages (create another hashmap?) / prevent duplicates, or
-even remind the user if there is another page with a similar URL?
-- Add animation for when reminder list loads onto page
-- Support different search engines, like DuckDuckGo
-- Add logging infrastructure? Enable/disable logging with a setting?
-- Read about Redux, and evaluate if it would be useful for this project
-- Update extension icons
-- Look into code splitting to improve bundle sizes?
+- [Med]: Add unit tests (probably use Jest)
+- [Med]: Add integration tests of some sort?
+- [High]: Add ability on options page to see list of saved pages
+- [Med]: Support different search engines, like DuckDuckGo
+- [Low]: Add logging infrastructure? Enable/disable logging with a setting?
+- [Low]: Read about Redux, and evaluate if it would be useful for this project
+- [Med]: Update extension icons
+- [Low]: Look into code splitting to improve bundle sizes?
 <https://reactjs.org/docs/code-splitting.html>
-- Add "Hide" or "Close" button to the right side of "Pages you have saved"
+- [High]: Add "Hide" or "Close" button to the right side of
+"Pages you have saved"
 - Consider adding some kind of different background, or accent of some kind
 using CSS to distinguish extension information from regular Google search
 results
-- Consider combining ReminderMap, ReminderURLMap, and KeywordMap into some
-general object that can be referred to, since in most cases they act as a
+- [Med]: Consider combining ReminderMap, ReminderURLMap, and KeywordMap into
+some general object that can be referred to, since in most cases they act as a
 general entity where all should be updated together, etc.
-- Add URL similarity feature so when trying to add a change, the popup
+- [Med]: Add URL similarity feature so when trying to add a change, the popup
 shows if there are already pages that have been saved with a similar URL
 (in case the URL happens to be changing?) - or perhaps an option when adding
 a URL to remove the URL parameters if desired
 (see https://stackoverflow.com/questions/6257463/how-to-get-the-url-without-any-parameters-in-javascript)
-- Add support for other browsers (start with Firefox?)
-- Fix UI bug with 'Keywords' in popup
-- Decide on uniform way to handle keywords/tags? Can these be multiple words?
-Possibly should modify get_metadata script to automatically separate phrases
-into individual words. Or allow phrases (requires more logic).
-- `get_metadata.js` may get injected to a page multiple times if the user
+- [Med]: Add support for other browsers (start with Firefox?)
+- [Low]: UI Bug: After creating a new reminder, saving it will cause the word
+"Keywords" to be crossed out. Possibly could be fixed by forcing some kind of
+UI refresh?
+- [Med]: Decide on uniform way to handle keywords/tags? Can these be multiple
+words? Possibly should modify get_metadata script to automatically separate
+phrases into individual words. Or allow phrases (requires more logic).
+- [Low]: `get_metadata.js` may get injected to a page multiple times if the user
 switches tabs multiple times. Is this an issue (or can this be easily fixed)?
 Could lead to problems down the road, not sure.
-- BUG: If you open the popup too soon after opening a new page, an error will
+- [Low]: If you open the popup too soon after opening a new page, an error will
 occur, since `get_metadata.js` will not have started executing yet.
 Possible workarounds: ???
-- Sort TODOs into high/mid/low priority
 
 ## Project structure
 

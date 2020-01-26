@@ -7,8 +7,9 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { PageMetadata } from '../common';
+import { PageMetadata, RequestOperation } from '../common';
 import { UnreachableCaseError } from '../utils';
+import { chromeRuntimeSendMessage } from '../chrome_helpers';
 
 const useStyles = makeStyles({
   box: {
@@ -68,14 +69,9 @@ type PopupContentProps = {
   initTitle?: string;
   initDescription?: string;
   initKeywords?: string[];
+  initReminderId: number | null;
   initMode: PopupContentMode;
   pageMetadata: PageMetadata;
-  saveReminder: (
-    title: string,
-    description: string,
-    keywords: string[],
-  ) => void;
-  deleteReminder?: () => void;
 };
 
 // TODO: add functionality to add page to reminders
@@ -226,16 +222,16 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     initTitle,
     initDescription,
     initKeywords,
+    initReminderId,
     initMode,
     pageMetadata,
-    saveReminder,
-    deleteReminder,
   } = props;
 
   // State variables for values that are displayed in the popup
   const [title, setTitle] = useState(initTitle);
   const [description, setDescription] = useState(initDescription);
   const [keywords, setKeywords] = useState(initKeywords);
+  const [reminderId, setReminderId] = useState(initReminderId);
   const [mode, setMode] = useState(initMode);
 
   // State variables for temporarily retaining the original
@@ -244,6 +240,54 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const [tempDescription, setTempDescription] = useState(initDescription);
   const [tempKeywords, setTempKeywords] = useState(initKeywords);
   const classes = useStyles();
+
+  const saveReminder = (
+    title: string,
+    description: string,
+    keywords: string[],
+  ): void => {
+    chromeRuntimeSendMessage({
+      operation: RequestOperation.SaveReminder,
+      reminderId: reminderId,
+      url: pageMetadata.url,
+      title: title,
+      description: description,
+      keywords: keywords,
+    })
+      .then(response => {
+        console.log(
+          `saveReminder message sent, recieved response: ${response}`,
+        );
+        const newReminderId = parseInt(response as string);
+        if (Number.isInteger(newReminderId)) {
+          setReminderId(newReminderId);
+        } else {
+          console.log('Response was not an integer, returning null.');
+        }
+      })
+      .catch(error =>
+        console.log(`Error sending saveReminder message: ${error}`),
+      );
+  };
+
+  const deleteReminder = (): void => {
+    if (reminderId === null) {
+      console.error('Cannot delete reminder, the reminderId stored is null.');
+      return;
+    }
+    chromeRuntimeSendMessage({
+      operation: RequestOperation.DeleteReminder,
+      reminderId: reminderId,
+    })
+      .then(response =>
+        console.log(
+          `deleteReminder message sent, recieved response: ${response}`,
+        ),
+      )
+      .catch(error =>
+        console.error(`Error sending deleteReminder message: ${error}`),
+      );
+  };
 
   const handleCreateButton = (
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -334,14 +378,8 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
   const handleDeleteButton = (
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void => {
-    if (deleteReminder === undefined) {
-      console.error(
-        'Delete reminder was called even though there is no reminder associated with this page!',
-      );
-    } else {
-      deleteReminder();
-      setMode('empty');
-    }
+    deleteReminder();
+    setMode('empty');
   };
 
   switch (mode) {
