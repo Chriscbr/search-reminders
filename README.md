@@ -38,6 +38,9 @@ want to test changes, by clicking on the refresh button on
 
 
 ## TODOs
+- [High]: Fix font sizes on Google search results.
+- [High]: Fix issue with "An error occurred" sometimes appearing if page
+hasn't fully loaded yet.
 - [High]: Add ability on options page to see list of saved pages
 - [Med]: Rename things from "reminders" to "saved items" to generalize potential
 future uses
