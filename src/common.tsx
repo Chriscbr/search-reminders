@@ -179,7 +179,7 @@ export class KeywordMap {
 
   add(reminder: Reminder): void {
     const reminderId = reminder.id;
-    reminder.keywords.forEach(keyword => {
+    reminder.keywords.forEach((keyword) => {
       const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.add(reminderId);
@@ -204,7 +204,7 @@ export class KeywordMap {
     addedKeywords: string[],
     removedKeywords: string[],
   ): void {
-    addedKeywords.forEach(keyword => {
+    addedKeywords.forEach((keyword) => {
       const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.add(reminderId);
@@ -212,7 +212,7 @@ export class KeywordMap {
         this._data.set(keyword, new Set([reminderId]));
       }
     });
-    removedKeywords.forEach(keyword => {
+    removedKeywords.forEach((keyword) => {
       const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.delete(reminderId);
@@ -226,7 +226,7 @@ export class KeywordMap {
 
   remove(reminder: Reminder): void {
     const reminderId = reminder.id;
-    reminder.keywords.forEach(keyword => {
+    reminder.keywords.forEach((keyword) => {
       const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.delete(reminderId);

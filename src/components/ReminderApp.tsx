@@ -8,7 +8,7 @@ type ReminderAppProps = {
   initReminders: Reminder[];
 };
 
-export const ReminderApp = function(
+export const ReminderApp = function (
   props: ReminderAppProps,
 ): JSX.Element | null {
   const [reminders, setReminders] = useState(props.initReminders);
@@ -38,12 +38,12 @@ export const ReminderApp = function(
       operation: RequestOperation.DeleteReminder,
       reminderId: reminderId,
     })
-      .then(response =>
+      .then((response) =>
         console.log(
           `deleteReminder message sent, recieved response: ${response}`,
         ),
       )
-      .catch(error =>
+      .catch((error) =>
         console.log(`Error sending deleteReminder message: ${error}`),
       );
   };

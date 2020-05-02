@@ -7,8 +7,8 @@ interface MetaTag extends Element {
 /**
  * Creates a message listener for handling `GetPageMetadata` requests.
  */
-const addMessageListener = function(): void {
-  chrome.runtime.onMessage.addListener(function(
+const addMessageListener = function (): void {
+  chrome.runtime.onMessage.addListener(function (
     request,
     _sender,
     sendResponse,

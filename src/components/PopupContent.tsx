@@ -75,7 +75,7 @@ type PopupContentProps = {
 };
 
 // TODO: add functionality to add page to reminders
-const renderEmptyMode = function(
+const renderEmptyMode = function (
   handleCreateButton: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void,
@@ -102,7 +102,7 @@ const renderEmptyMode = function(
   );
 };
 
-const renderEditingMode = function(
+const renderEditingMode = function (
   title: string,
   description: string,
   keywords: string[],
@@ -170,7 +170,7 @@ const renderEditingMode = function(
   );
 };
 
-const renderSavedMode = function(
+const renderSavedMode = function (
   title: string,
   description: string,
   keywords: string[],
@@ -217,7 +217,7 @@ const renderSavedMode = function(
   );
 };
 
-export const PopupContent = function(props: PopupContentProps): JSX.Element {
+export const PopupContent = function (props: PopupContentProps): JSX.Element {
   const {
     initTitle,
     initDescription,
@@ -254,7 +254,7 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
       description: description,
       keywords: keywords,
     })
-      .then(response => {
+      .then((response) => {
         console.log(
           `saveReminder message sent, recieved response: ${response}`,
         );
@@ -265,7 +265,7 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
           console.log('Response was not an integer, returning null.');
         }
       })
-      .catch(error =>
+      .catch((error) =>
         console.log(`Error sending saveReminder message: ${error}`),
       );
   };
@@ -279,12 +279,12 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
       operation: RequestOperation.DeleteReminder,
       reminderId: reminderId,
     })
-      .then(response =>
+      .then((response) =>
         console.log(
           `deleteReminder message sent, recieved response: ${response}`,
         ),
       )
-      .catch(error =>
+      .catch((error) =>
         console.error(`Error sending deleteReminder message: ${error}`),
       );
   };
@@ -325,7 +325,7 @@ export const PopupContent = function(props: PopupContentProps): JSX.Element {
     if (keywords === undefined) {
       console.error('Unable to delete keyword, keywords is undefined.');
     } else {
-      setKeywords(keywords.filter(keyword => keyword !== deletedKeyword));
+      setKeywords(keywords.filter((keyword) => keyword !== deletedKeyword));
     }
   };
 

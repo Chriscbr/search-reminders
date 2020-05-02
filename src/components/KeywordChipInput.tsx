@@ -17,7 +17,7 @@ type KeywordChipInputProps = {
   handleDeleteKeyword?: (deletedKeyword: string, index: number) => void;
 };
 
-export const KeywordChipInput = function(
+export const KeywordChipInput = function (
   props: KeywordChipInputProps,
 ): JSX.Element {
   const { keywords, disabled, handleAddKeyword, handleDeleteKeyword } = props;

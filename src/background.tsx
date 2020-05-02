@@ -21,7 +21,7 @@ import {
 } from './chrome_helpers';
 import rawTestData from './testData.json';
 
-const saveLocalDataToStorage = function(
+const saveLocalDataToStorage = function (
   reminderStore: ReminderStore,
 ): Promise<unknown> {
   const reminders = reminderStore.values();
@@ -36,16 +36,16 @@ const saveLocalDataToStorage = function(
   return chromeStorageSyncSet(userData);
 };
 
-const loadDataFromStorage = function(): Promise<UserData> {
+const loadDataFromStorage = function (): Promise<UserData> {
   return chromeStorageSyncGet(['reminders', 'currentId'])
-    .then(response => {
+    .then((response) => {
       const data = response as UserDataJSON;
       const reminders = data.reminders.map((value: string) =>
         Reminder.fromJSON(value),
       );
       return { reminders: reminders, currentId: data.currentId };
     })
-    .catch(error => {
+    .catch((error) => {
       console.log(`Data not found in storage, possible error: ${error}`);
       console.log('Initializing with empty data.');
       return saveLocalDataToStorage(new ReminderStore(0))
@@ -55,7 +55,7 @@ const loadDataFromStorage = function(): Promise<UserData> {
           );
           return { reminders: [], currentId: 0 };
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('Unable to save empty user data to local storage.');
           console.log(`Received error message: ${error}`);
           console.log('Resuming with temporary empty user data.');
@@ -64,7 +64,7 @@ const loadDataFromStorage = function(): Promise<UserData> {
     });
 };
 
-const addReminders = function(
+const addReminders = function (
   reminders: Reminder[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
@@ -77,7 +77,7 @@ const addReminders = function(
   });
 };
 
-const addRemindersWithoutIds = function(
+const addRemindersWithoutIds = function (
   testData: ReminderParams[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
@@ -93,7 +93,7 @@ const addRemindersWithoutIds = function(
   return reminderIds;
 };
 
-const updateReminder = function(
+const updateReminder = function (
   id: number,
   url: string,
   title: string,
@@ -110,10 +110,10 @@ const updateReminder = function(
   }
   const priorKeywords = reminder.keywords;
   const addedKeywords = keywords.filter(
-    keyword => priorKeywords.indexOf(keyword) === -1,
+    (keyword) => priorKeywords.indexOf(keyword) === -1,
   );
   const removedKeywords = priorKeywords.filter(
-    keyword => keywords.indexOf(keyword) === -1,
+    (keyword) => keywords.indexOf(keyword) === -1,
   );
 
   // Update all data structures
@@ -123,7 +123,7 @@ const updateReminder = function(
   reminderURLMap.add(reminder);
 };
 
-const deleteReminder = function(
+const deleteReminder = function (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
@@ -136,7 +136,7 @@ const deleteReminder = function(
   reminderURLMap.remove(reminder);
 };
 
-const deleteAllLocalData = function(
+const deleteAllLocalData = function (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
@@ -157,7 +157,7 @@ const deleteAllLocalData = function(
  * @param reminderStore reference to reminder store
  * @param sendResponse callback function for sending the response message
  */
-const handleGetRelevantReminders = function(
+const handleGetRelevantReminders = function (
   request: GetRelevantRemindersRequest,
   keywordMap: KeywordMap,
   reminderStore: ReminderStore,
@@ -169,10 +169,10 @@ const handleGetRelevantReminders = function(
   const reminderIds: Set<number> = new Set();
 
   // Collect all of the reminder IDs related to any of the keywords
-  keywords.forEach(keyword => {
+  keywords.forEach((keyword) => {
     const keywordIds = keywordMap.get(keyword);
     if (keywordIds !== undefined) {
-      keywordIds.forEach(id => {
+      keywordIds.forEach((id) => {
         reminderIds.add(id);
       });
     }
@@ -181,7 +181,7 @@ const handleGetRelevantReminders = function(
 
   // Convert the set of reminder IDs to a list of Reminders
   const reminderList: Reminder[] = [];
-  reminderIds.forEach(id => {
+  reminderIds.forEach((id) => {
     const reminder = reminderStore.getReminder(id);
     if (reminder === undefined) {
       throw new Error(`Reminder not found in reminderMap for id: ${id}`);
@@ -211,7 +211,7 @@ const handleGetRelevantReminders = function(
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
  */
-const handleAddTestData = function(
+const handleAddTestData = function (
   testData: ReminderParams[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
@@ -225,7 +225,7 @@ const handleAddTestData = function(
       console.log('Sending response to addTestData: SUCCESS');
       sendResponse('SUCCESS');
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(`Error occurred saving data to sync storage: ${error}`);
       console.log('Sending response to addTestData: ERROR');
       sendResponse('ERROR');
@@ -242,7 +242,7 @@ const handleAddTestData = function(
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
  */
-const handleDeleteUserData = function(
+const handleDeleteUserData = function (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
@@ -255,7 +255,7 @@ const handleDeleteUserData = function(
       console.log('Sending response to deleteTestData: SUCCESS');
       sendResponse('SUCCESS');
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(`Error occured clearing sync storage: ${error}`);
       console.log('Sending response to deleteTestData: ERROR');
       sendResponse('ERROR');
@@ -273,7 +273,7 @@ const handleDeleteUserData = function(
  * @param keywordMap reference to keyword map
  * @param sendResponse callback function for sending the response message
  */
-const handleSaveReminder = function(
+const handleSaveReminder = function (
   request: SaveReminderRequest,
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
@@ -315,7 +315,7 @@ const handleSaveReminder = function(
       console.log('Sending response to updateReminder: SUCCESS');
       sendResponse(reminderId.toString());
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(`Error occured updating sync storage: ${error}`);
       console.log('Sending response to updateReminder: ERROR');
       sendResponse('ERROR');
@@ -332,7 +332,7 @@ const handleSaveReminder = function(
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
  */
-const handleDeleteReminder = function(
+const handleDeleteReminder = function (
   request: DeleteReminderRequest,
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
@@ -346,7 +346,7 @@ const handleDeleteReminder = function(
       console.log('Sending response to deleteReminder: SUCCESS');
       sendResponse('SUCCESS');
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(`Error occured updating sync storage: ${error}`);
       console.log('Sending response to deleteReminder: ERROR');
       sendResponse('ERROR');
@@ -363,7 +363,7 @@ const handleDeleteReminder = function(
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
  */
-const handleGetReminderFromURL = function(
+const handleGetReminderFromURL = function (
   request: GetReminderFromURLRequest,
   reminderStore: ReminderStore,
   reminderURLMap: ReminderURLMap,
@@ -399,13 +399,13 @@ const handleGetReminderFromURL = function(
  * @param reminderURLMap reference to URL map
  * @param testData a list of test data
  */
-const addMessageListener = function(
+const addMessageListener = function (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
   testData: ReminderParams[],
 ): void {
-  chrome.runtime.onMessage.addListener(function(
+  chrome.runtime.onMessage.addListener(function (
     request: Request,
     sender,
     sendResponse,
@@ -524,11 +524,11 @@ loadDataFromStorage().then((data: UserData) => {
     });
   };
 
-  chrome.tabs.onActivated.addListener(function(_details) {
+  chrome.tabs.onActivated.addListener(function (_details) {
     console.log('onActivated listener injecting get_metadata script.');
     runGetMetadataScript();
   });
-  chrome.tabs.onUpdated.addListener(function(
+  chrome.tabs.onUpdated.addListener(function (
     _tabId: number,
     changeInfo: chrome.tabs.TabChangeInfo,
     _tab: chrome.tabs.Tab,
