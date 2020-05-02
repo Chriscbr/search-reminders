@@ -25,8 +25,8 @@ export const ReminderApp = function (
     if (index === -1) {
       console.error(
         `Error removing reminderId ${reminderId} from reminder list:`,
+        reminders,
       );
-      console.error(reminders);
       return;
     }
     remindersCopy.splice(index, 1);

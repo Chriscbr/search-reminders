@@ -38,9 +38,8 @@ want to test changes, by clicking on the refresh button on
 
 
 ## TODOs
-- [High]: Fix font sizes on Google search results.
-- [High]: Fix issue with "An error occurred" sometimes appearing if page
-hasn't fully loaded yet.
+- [High]: Fix bug: If you open the popup too soon after opening a new page,
+an error will occur, since `get_metadata.js` hasn't started executing yet.
 - [High]: Add ability on options page to see list of saved pages
 - [Med]: Rename things from "reminders" to "saved items" to generalize potential
 future uses
@@ -73,9 +72,6 @@ phrases into individual words. Or allow phrases (requires more logic).
 - [Low]: `get_metadata.js` may get injected to a page multiple times if the user
 switches tabs multiple times. Is this an issue (or can this be easily fixed)?
 Could lead to problems down the road, not sure.
-- [Low]: If you open the popup too soon after opening a new page, an error will
-occur, since `get_metadata.js` will not have started executing yet.
-Possible workarounds: ???
 - [Med]: Hide reminder list on Google search results page if you are not
 on the first page of results
 

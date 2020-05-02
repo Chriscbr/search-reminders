@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import clsx from 'clsx';
 import { Reminder } from '../common';
 import ReminderItem from './ReminderItem';
@@ -13,6 +14,11 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     reminderListWrapper: {
       marginBottom: '20px',
+      // This is a hack to ensure that the containers stay at their maximum
+      // width even during the dropdown transitions.
+      '& MuiCollapse-container': {
+        width: '100%',
+      },
     },
     reminderListTitle: {
       marginBottom: '15px',
@@ -21,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
       transform: 'rotate(0deg)',
       float: 'right',
       position: 'relative',
-      top: '-10px',
+      top: '-15px',
       transition: theme.transitions.create('transform', {
         duration: theme.transitions.duration.shortest,
       }),
@@ -29,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
     expandOpen: {
       transform: 'rotate(180deg)',
     },
-    collapseWrapper: {
+    maxWidth: {
       width: '100%',
     },
   }),
@@ -44,7 +50,7 @@ export const ReminderList = function (props: ReminderListProps): JSX.Element {
   const classes = useStyles();
   const { reminders, deleteButtonHandler } = props;
 
-  const [expanded, setExpanded] = React.useState(true);
+  const [expanded, setExpanded] = useState(true);
 
   function handleExpandClick(): void {
     setExpanded(!expanded);
@@ -78,7 +84,9 @@ export const ReminderList = function (props: ReminderListProps): JSX.Element {
         timeout="auto"
         unmountOnExit
         classes={{
-          wrapper: classes.collapseWrapper,
+          wrapper: classes.maxWidth,
+          wrapperInner: classes.maxWidth,
+          container: classes.maxWidth,
         }}
       >
         {reminderItems}

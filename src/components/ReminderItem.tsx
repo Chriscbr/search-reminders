@@ -12,6 +12,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 const useStyles = makeStyles({
   reminderCard: {
     marginBottom: '10px',
+    width: '100%',
   },
   reminderCardContent: {
     paddingBottom: 0,
@@ -31,6 +32,7 @@ const useStyles = makeStyles({
     WebkitBoxOrient: 'vertical',
     WebkitLineClamp: 3,
     display: '-webkit-box',
+    fontSize: '14px',
   },
   extendedIcon: {
     marginRight: '5px',
@@ -53,7 +55,7 @@ export const ReminderItem = function (props: ReminderItemProps): JSX.Element {
     <Card className={classes.reminderCard}>
       <CardContent className={classes.reminderCardContent}>
         <Typography
-          component="h2"
+          component="h3"
           className={classes.reminderTitle}
           gutterBottom
         >
