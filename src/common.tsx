@@ -102,8 +102,8 @@ export class ReminderStore {
       description,
       keywords,
     );
-    reminder.id = this._currentId;
-    this._data.set(this._currentId++, reminder);
+    this._data.set(this._currentId, reminder);
+    this._currentId++;
     return reminder;
   }
 
@@ -303,26 +303,27 @@ export type PageMetadata = {
   keywords: string[];
 };
 
-// TODO: Is this any different from just a TypeScript string literal union type?
 export const enum RequestOperation {
-  GetRelevantReminders = 'GetRelevantReminders',
   AddTestData = 'AddTestData',
   DeleteUserData = 'DeleteUserData',
   SaveReminder = 'SaveReminder',
   DeleteReminder = 'DeleteReminder',
   GetReminderFromURL = 'GetReminderFromURL',
+  GetRemindersByKeywords = 'GetRemindersByKeywords',
+  GetAllReminders = 'GetAllReminders',
   GetPageMetadata = 'GetPageMetadata',
 }
 
 // This pattern is known as the 'discriminated union';
 // see https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions
 export type Request =
-  | GetRelevantRemindersRequest
   | AddTestDataRequest
   | DeleteUserDataRequest
   | SaveReminderRequest
   | DeleteReminderRequest
   | GetReminderFromURLRequest
+  | GetRemindersByKeywordsRequest
+  | GetAllRemindersRequest
   | GetPageMetadataRequest;
 
 export interface RequestInterface {
@@ -358,9 +359,13 @@ export interface GetReminderFromURLRequest extends RequestInterface {
   url: string;
 }
 
-export interface GetRelevantRemindersRequest extends RequestInterface {
-  operation: RequestOperation.GetRelevantReminders;
+export interface GetRemindersByKeywordsRequest extends RequestInterface {
+  operation: RequestOperation.GetRemindersByKeywords;
   keywords: string[];
+}
+
+export interface GetAllRemindersRequest extends RequestInterface {
+  operation: RequestOperation.GetAllReminders;
 }
 
 export interface GetPageMetadataRequest extends RequestInterface {

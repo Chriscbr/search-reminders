@@ -1,5 +1,8 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
-import { RequestOperation } from './common';
+import { Reminder, RequestOperation } from './common';
+import { SavedRemindersView } from './components/SavedRemindersView';
 
 const addTestDataButtonHandler = function (): void {
   chromeRuntimeSendMessage({ operation: RequestOperation.AddTestData })
@@ -10,9 +13,7 @@ const addTestDataButtonHandler = function (): void {
         throw new Error(`addTestData response: ${response}`);
       }
     })
-    .catch((error) => {
-      console.log(`Error during communication with addTestData: ${error}`);
-    });
+    .catch((error) => console.error(error));
 };
 
 const deleteSavedDataButtonHandler = function (): void {
@@ -24,9 +25,7 @@ const deleteSavedDataButtonHandler = function (): void {
         throw new Error(`deleteSavedData response: ${response}`);
       }
     })
-    .catch((error) => {
-      console.log(`Error during communication with deleteSavedData: ${error}`);
-    });
+    .catch((error) => console.error(error));
 };
 
 const setupEventListener = function (
@@ -47,3 +46,26 @@ const setupEventListeners = function (): void {
 };
 
 setupEventListeners();
+
+/**
+ * Get a list of all of the reminders the user has saved.
+ */
+const getAllReminders = function (): Promise<Reminder[] | null> {
+  return chromeRuntimeSendMessage({
+    operation: RequestOperation.GetAllReminders,
+  })
+    .then((response) => {
+      const data = response as string[];
+      return data.map((value: string) => Reminder.fromJSON(value));
+    })
+    .catch((err) => {
+      console.error(err);
+      return null;
+    });
+};
+
+const savedRemindersView = (
+  <SavedRemindersView getAllReminders={getAllReminders} />
+);
+
+ReactDOM.render(savedRemindersView, document.getElementById('savedPages'));

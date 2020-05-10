@@ -40,7 +40,7 @@ const getCurrentPageReminder = function (): Promise<Reminder | null> {
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       return null;
     });
 };
@@ -62,7 +62,6 @@ const getPageMetadata = function (): Promise<PageMetadata | null> {
       return response as PageMetadata;
     })
     .catch((error) => {
-      console.error(`Error received:`);
       console.error(error);
       return null;
     });

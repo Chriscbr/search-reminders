@@ -42,7 +42,7 @@ const requestRelevantReminders = function (
 ): Promise<Reminder[]> {
   console.log('Sending a request for relevant reminders.');
   return chromeRuntimeSendMessage({
-    operation: RequestOperation.GetRelevantReminders,
+    operation: RequestOperation.GetRemindersByKeywords,
     keywords: keywords,
   }).then((response) => {
     const data = response as { reminders: string[] };
@@ -89,9 +89,7 @@ const injectRemindersList = function (): void {
         console.log('ReminderApp rendered.'),
       );
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch((err) => console.error(err));
 };
 
 const isGoogleSearchPage = function (): boolean {

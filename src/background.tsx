@@ -10,7 +10,7 @@ import {
   Request,
   DeleteReminderRequest,
   GetReminderFromURLRequest,
-  GetRelevantRemindersRequest,
+  GetRemindersByKeywordsRequest,
   SaveReminderRequest,
 } from './common';
 import { UnreachableCaseError } from './utils';
@@ -157,8 +157,8 @@ const deleteAllLocalData = function (
  * @param reminderStore reference to reminder store
  * @param sendResponse callback function for sending the response message
  */
-const handleGetRelevantReminders = function (
-  request: GetRelevantRemindersRequest,
+const handleGetRemindersByKeywords = function (
+  request: GetRemindersByKeywordsRequest,
   keywordMap: KeywordMap,
   reminderStore: ReminderStore,
   sendResponse: (args?: unknown) => void,
@@ -190,12 +190,11 @@ const handleGetRelevantReminders = function (
     reminderList.push(reminder);
   });
 
-  // Sent out the response (a list of reminders)
+  // Send out the response (a list of reminders)
   const response = {
     reminders: reminderList,
   };
-  console.log('Sending response to getReminderData with data:');
-  console.log(response);
+  console.log('Sending response to getReminderData', response);
   sendResponse(response);
 };
 
@@ -359,6 +358,7 @@ const handleDeleteReminder = function (
  * `request`, and then cross-references with `reminderStore` to get the full
  * `Reminder` object, which is then sent as a response.
  *
+ * @param request the request containing the URL of the target reminder
  * @param reminderStore reference to reminder store
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
@@ -390,6 +390,20 @@ const handleGetReminderFromURL = function (
 };
 
 /**
+ * Handles a request to get a list of all Reminders.
+ *
+ * @param reminderStore reference to reminder store
+ * @param sendResponse callback function for sending the response message
+ */
+const handleGetAllReminders = function (
+  reminderStore: ReminderStore,
+  sendResponse: (args?: unknown) => void,
+): void {
+  const reminders = reminderStore.values();
+  sendResponse(reminders);
+};
+
+/**
  * Initializes a message listener so that the `background.js` script can
  * response to messages sent from other parts of the extension, such as
  * `content_script.js` or `popup.js`.
@@ -418,14 +432,6 @@ const addMessageListener = function (
     console.log(`Message operation: ${request.operation}`);
 
     switch (request.operation) {
-      case RequestOperation.GetRelevantReminders:
-        handleGetRelevantReminders(
-          request,
-          keywordMap,
-          reminderStore,
-          sendResponse,
-        );
-        break;
       case RequestOperation.AddTestData:
         handleAddTestData(
           testData,
@@ -469,8 +475,19 @@ const addMessageListener = function (
           sendResponse,
         );
         break;
+      case RequestOperation.GetRemindersByKeywords:
+        handleGetRemindersByKeywords(
+          request,
+          keywordMap,
+          reminderStore,
+          sendResponse,
+        );
+        break;
+      case RequestOperation.GetAllReminders:
+        handleGetAllReminders(reminderStore, sendResponse);
+        break;
       case RequestOperation.GetPageMetadata:
-        console.log("Received operation  'GetPageMetadata'. Ignoring.");
+        console.log("Received operation 'GetPageMetadata'. Ignoring.");
         break;
       default:
         sendResponse('Error, invalid request operation received.');

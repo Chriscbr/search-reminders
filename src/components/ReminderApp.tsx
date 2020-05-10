@@ -43,9 +43,7 @@ export const ReminderApp = function (
           `deleteReminder message sent, recieved response: ${response}`,
         ),
       )
-      .catch((error) =>
-        console.log(`Error sending deleteReminder message: ${error}`),
-      );
+      .catch((error) => console.error(error));
   };
 
   if (reminders.length === 0) return null;

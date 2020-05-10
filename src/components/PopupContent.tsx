@@ -265,9 +265,7 @@ export const PopupContent = function (props: PopupContentProps): JSX.Element {
           console.log('Response was not an integer, returning null.');
         }
       })
-      .catch((error) =>
-        console.log(`Error sending saveReminder message: ${error}`),
-      );
+      .catch((error) => console.error(error));
   };
 
   const deleteReminder = (): void => {
@@ -284,9 +282,7 @@ export const PopupContent = function (props: PopupContentProps): JSX.Element {
           `deleteReminder message sent, recieved response: ${response}`,
         ),
       )
-      .catch((error) =>
-        console.error(`Error sending deleteReminder message: ${error}`),
-      );
+      .catch((error) => console.error(error));
   };
 
   const handleCreateButton = (
