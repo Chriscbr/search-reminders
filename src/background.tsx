@@ -530,10 +530,13 @@ loadDataFromStorage().then((data: UserData) => {
   const runGetMetadataScript = (): void => {
     chrome.tabs.executeScript({ file: 'js/get_metadata.js' }, () => {
       if (chrome.runtime.lastError) {
+        // We don't use console.error  here because in many cases get_metadata
+        // will guaranteed fail because the permission isn't save-able, e.g.
+        // in the case of chrome:// URLs.
         console.log(
-          `Whoops, an error occurred trying to execute get_metadata.js.`,
+          'Whoops, an error occurred trying to execute get_metadata.js:',
+          chrome.runtime.lastError,
         );
-        console.log(chrome.runtime.lastError);
       }
     });
   };

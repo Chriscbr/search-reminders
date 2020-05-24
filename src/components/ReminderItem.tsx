@@ -44,7 +44,7 @@ const useStyles = makeStyles({
 
 type ReminderItemProps = {
   reminder: Reminder;
-  deleteButtonHandler: (event: React.MouseEvent, reminderId: number) => void;
+  deleteButtonHandler: (reminderId: number) => void;
 };
 
 export const ReminderItem = (props: ReminderItemProps): JSX.Element => {
@@ -79,7 +79,7 @@ export const ReminderItem = (props: ReminderItemProps): JSX.Element => {
         <Button
           size="small"
           aria-label="open"
-          onClick={(event): void => deleteButtonHandler(event, reminder.id)}
+          onClick={(_event): void => deleteButtonHandler(reminder.id)}
         >
           <Delete className={classes.extendedIcon} fontSize="small" />
           Delete

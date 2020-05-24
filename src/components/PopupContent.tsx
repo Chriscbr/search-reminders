@@ -70,8 +70,9 @@ type PopupContentProps = {
   initDescription?: string;
   initKeywords?: string[];
   initReminderId: number | null;
+  initURL: string;
   initMode: PopupContentMode;
-  pageMetadata: PageMetadata;
+  getPageMetadata: () => Promise<PageMetadata | null>;
 };
 
 const renderEmptyMode = (
@@ -222,8 +223,9 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
     initDescription,
     initKeywords,
     initReminderId,
+    initURL,
     initMode,
-    pageMetadata,
+    getPageMetadata,
   } = props;
 
   // State variables for values that are displayed in the popup
@@ -231,6 +233,7 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
   const [description, setDescription] = useState(initDescription);
   const [keywords, setKeywords] = useState(initKeywords);
   const [reminderId, setReminderId] = useState(initReminderId);
+  const [url] = useState(initURL);
   const [mode, setMode] = useState(initMode);
 
   // State variables for temporarily retaining the original
@@ -248,7 +251,7 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
     chromeRuntimeSendMessage({
       operation: RequestOperation.SaveReminder,
       reminderId: reminderId,
-      url: pageMetadata.url,
+      url: url,
       title: title,
       description: description,
       keywords: keywords,
@@ -284,12 +287,19 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
       .catch((error) => console.error(error));
   };
 
-  const handleCreateButton = (
+  const handleCreateButton = async (
     _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void => {
-    setTitle(pageMetadata.title);
-    setDescription(pageMetadata.description);
-    setKeywords(pageMetadata.keywords);
+  ): Promise<void> => {
+    let pageMetadata = await getPageMetadata();
+    if (pageMetadata === null) {
+      setTitle('');
+      setDescription('');
+      setKeywords([]);
+    } else {
+      setTitle(pageMetadata.title);
+      setDescription(pageMetadata.description);
+      setKeywords(pageMetadata.keywords);
+    }
     setMode('editing');
   };
 

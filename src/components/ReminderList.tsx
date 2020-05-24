@@ -43,13 +43,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type ReminderListProps = {
   reminders: Reminder[];
-  deleteButtonHandler: (event: React.MouseEvent, reminderId: number) => void;
+  deleteButtonHandler: (reminderId: number) => void;
 };
 
 export const ReminderList = (props: ReminderListProps): JSX.Element => {
-  const classes = useStyles();
   const { reminders, deleteButtonHandler } = props;
-
+  const classes = useStyles();
   const [expanded, setExpanded] = useState(true);
 
   const handleExpandClick = (): void => {

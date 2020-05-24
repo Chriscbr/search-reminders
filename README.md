@@ -43,8 +43,6 @@ want to test changes, by clicking on the refresh button on
 
 ## TODOs
 
-- [High]: Fix bug: If you open the popup too soon after opening a new page, an
-  error will occur, since `get_metadata.js` hasn't started executing yet.
 - [High]: Add ability on options page to see list of saved pages
 - [Med]: Put components into different subdirectories
 - [Med]: Rename things from "reminders" to "saved items" to generalize potential

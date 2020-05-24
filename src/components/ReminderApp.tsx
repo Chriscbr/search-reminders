@@ -11,10 +11,7 @@ type ReminderAppProps = {
 export const ReminderApp = (props: ReminderAppProps): JSX.Element | null => {
   const [reminders, setReminders] = useState(props.initReminders);
 
-  const deleteButtonHandler = (
-    _event: React.MouseEvent,
-    reminderId: number,
-  ): void => {
+  const deleteButtonHandler = (reminderId: number): void => {
     // Update the state with a copy of the list with the reminder removed
     const remindersCopy = [...reminders];
     const index = remindersCopy.findIndex(
@@ -44,9 +41,7 @@ export const ReminderApp = (props: ReminderAppProps): JSX.Element | null => {
       .catch((error) => console.error(error));
   };
 
-  if (reminders.length === 0) return null;
-
-  return (
+  return reminders.length === 0 ? null : (
     <ReminderList
       reminders={reminders}
       deleteButtonHandler={deleteButtonHandler}

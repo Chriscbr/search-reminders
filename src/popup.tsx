@@ -18,31 +18,25 @@ import 'typeface-roboto';
  *
  * @param url the URL of the current page (active tab)
  */
-const getCurrentPageReminder = (): Promise<Reminder | null> => {
-  return chromeTabsQuery({ active: true, lastFocusedWindow: true })
-    .then((tabs: chrome.tabs.Tab[]) => {
-      const url = tabs[0].url;
-      if (url === undefined) {
-        throw new Error('No URL found for current tab.');
-      }
-      console.log(`Sending request getReminderFromURL with url: ${url}.`);
-      return chromeRuntimeSendMessage({
-        operation: RequestOperation.GetReminderFromURL,
-        url: url,
-      }) as Promise<string>;
-    })
-    .then((response: string) => {
-      console.log(`Received getReminderFromURL response: ${response}`);
-      if (response === 'null') {
-        return null;
-      } else {
-        return Reminder.fromJSON(response);
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      return null;
-    });
+const getCurrentPageReminder = async (): Promise<
+  [string | null, Reminder | null]
+> => {
+  let tabs = await chromeTabsQuery({ active: true, lastFocusedWindow: true });
+  const url = tabs[0].url;
+  if (url === undefined) {
+    return [null, null];
+  }
+  console.log(`Sending request getReminderFromURL with url: ${url}.`);
+  let response = (await chromeRuntimeSendMessage({
+    operation: RequestOperation.GetReminderFromURL,
+    url: url,
+  })) as string;
+  console.log(`Received getReminderFromURL response: ${response}`);
+  if (response === 'null') {
+    return [url, null];
+  } else {
+    return [url, Reminder.fromJSON(response)];
+  }
 };
 
 /**
