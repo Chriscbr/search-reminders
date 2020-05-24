@@ -79,7 +79,7 @@ export const ReminderItem = (props: ReminderItemProps): JSX.Element => {
         <Button
           size="small"
           aria-label="open"
-          onClick={(_event): void => deleteButtonHandler(reminder.id)}
+          onClick={(): void => deleteButtonHandler(reminder.id)}
         >
           <Delete className={classes.extendedIcon} fontSize="small" />
           Delete

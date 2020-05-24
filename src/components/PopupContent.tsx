@@ -76,9 +76,7 @@ type PopupContentProps = {
 };
 
 const renderEmptyMode = (
-  handleCreateButton: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => void,
+  handleCreateButton: () => void,
   classes: Record<string, string>,
 ): JSX.Element => {
   return (
@@ -287,9 +285,7 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
       .catch((error) => console.error(error));
   };
 
-  const handleCreateButton = async (
-    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): Promise<void> => {
+  const handleCreateButton = async (): Promise<void> => {
     let pageMetadata = await getPageMetadata();
     if (pageMetadata === null) {
       setTitle('');
@@ -334,9 +330,7 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
     }
   };
 
-  const handleSaveButton = (
-    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void => {
+  const handleSaveButton = (): void => {
     if (
       title === undefined ||
       description === undefined ||
@@ -354,9 +348,7 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
     }
   };
 
-  const handleExitButton = (
-    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void => {
+  const handleExitButton = (): void => {
     // Two cases: the user is exiting after attempting to create a reminder
     // (first branch), and the user is exiting after attempting to edit the
     // reminder (second branch).
@@ -374,15 +366,11 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
     }
   };
 
-  const handleEditButton = (
-    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void => {
+  const handleEditButton = (): void => {
     setMode('editing');
   };
 
-  const handleDeleteButton = (
-    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void => {
+  const handleDeleteButton = (): void => {
     deleteReminder();
     setMode('empty');
   };
