@@ -76,29 +76,27 @@ type PopupContentProps = {
 };
 
 const renderEmptyMode = (
-  handleCreateButton: () => void,
+  handleCreateButton: () => Promise<void>,
   classes: Record<string, string>,
-): JSX.Element => {
-  return (
-    <Box className={classes.box}>
-      <Typography align="center" component="p">
-        This page is not currently saved.
-      </Typography>
-      <Grid
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justify="center"
-        className={classes.createButton}
-      >
-        <Button variant="contained" onClick={handleCreateButton}>
-          Create a Reminder
-        </Button>
-      </Grid>
-    </Box>
-  );
-};
+): JSX.Element => (
+  <Box className={classes.box}>
+    <Typography align="center" component="p">
+      This page is not currently saved.
+    </Typography>
+    <Grid
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      justify="center"
+      className={classes.createButton}
+    >
+      <Button variant="contained" onClick={handleCreateButton}>
+        Create a Reminder
+      </Button>
+    </Grid>
+  </Box>
+);
 
 const renderEditingMode = (
   title: string,
@@ -115,58 +113,56 @@ const renderEditingMode = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void,
   classes: Record<string, string>,
-): JSX.Element => {
-  return (
-    <>
-      <Box className={classes.boxMiddle}>
-        <TextField
-          label="Title"
-          value={title}
-          onChange={handleChangeTitle}
-          variant="filled"
-          fullWidth
-        />
-        <TextField
-          label="Description"
-          value={description}
-          onChange={handleChangeDescription}
-          variant="filled"
-          className={classes.descriptionTextField}
-          multiline
-          rows="4"
-          fullWidth
-        />
-        <KeywordChipInput
-          keywords={keywords}
-          handleAddKeyword={handleAddKeyword}
-          handleDeleteKeyword={handleDeleteKeyword}
-        />
-      </Box>
-      <Grid container justify="center" className={classes.buttonSpacing}>
-        <Grid item>
-          <Button
-            size="small"
-            variant="contained"
-            aria-label="save"
-            className={classes.button}
-            onClick={handleSaveButton}
-          >
-            Save
-          </Button>
-          <Button
-            size="small"
-            variant="contained"
-            aria-label="exit"
-            className={classes.button}
-            onClick={handleExitButton}
-          >
-            Exit
-          </Button>
-        </Grid>
+): JSX.Element => (
+  <>
+    <Box className={classes.boxMiddle}>
+      <TextField
+        label="Title"
+        value={title}
+        onChange={handleChangeTitle}
+        variant="filled"
+        fullWidth
+      />
+      <TextField
+        label="Description"
+        value={description}
+        onChange={handleChangeDescription}
+        variant="filled"
+        className={classes.descriptionTextField}
+        multiline
+        rows="4"
+        fullWidth
+      />
+      <KeywordChipInput
+        keywords={keywords}
+        handleAddKeyword={handleAddKeyword}
+        handleDeleteKeyword={handleDeleteKeyword}
+      />
+    </Box>
+    <Grid container justify="center" className={classes.buttonSpacing}>
+      <Grid item>
+        <Button
+          size="small"
+          variant="contained"
+          aria-label="save"
+          className={classes.button}
+          onClick={handleSaveButton}
+        >
+          Save
+        </Button>
+        <Button
+          size="small"
+          variant="contained"
+          aria-label="exit"
+          className={classes.button}
+          onClick={handleExitButton}
+        >
+          Exit
+        </Button>
       </Grid>
-    </>
-  );
-};
+    </Grid>
+  </>
+);
 
 const renderSavedMode = (
   title: string,
@@ -179,41 +175,39 @@ const renderSavedMode = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void,
   classes: Record<string, string>,
-): JSX.Element => {
-  return (
-    <>
-      <Box className={classes.boxMiddle}>
-        <Typography className={classes.pageTitle}>{title}</Typography>
-        <Typography component="p" className={classes.pageDescription}>
-          {description}
-        </Typography>
-        <KeywordChipInput keywords={keywords} disabled={true} />
-      </Box>
-      <Grid container justify="center" className={classes.buttonSpacing}>
-        <Grid item>
-          <Button
-            size="small"
-            variant="contained"
-            aria-label="edit"
-            className={classes.button}
-            onClick={handleEditButton}
-          >
-            Edit
-          </Button>
-          <Button
-            size="small"
-            variant="contained"
-            aria-label="delete"
-            className={classes.button}
-            onClick={handleDeleteButton}
-          >
-            Delete
-          </Button>
-        </Grid>
+): JSX.Element => (
+  <>
+    <Box className={classes.boxMiddle}>
+      <Typography className={classes.pageTitle}>{title}</Typography>
+      <Typography component="p" className={classes.pageDescription}>
+        {description}
+      </Typography>
+      <KeywordChipInput keywords={keywords} disabled={true} />
+    </Box>
+    <Grid container justify="center" className={classes.buttonSpacing}>
+      <Grid item>
+        <Button
+          size="small"
+          variant="contained"
+          aria-label="edit"
+          className={classes.button}
+          onClick={handleEditButton}
+        >
+          Edit
+        </Button>
+        <Button
+          size="small"
+          variant="contained"
+          aria-label="delete"
+          className={classes.button}
+          onClick={handleDeleteButton}
+        >
+          Delete
+        </Button>
       </Grid>
-    </>
-  );
-};
+    </Grid>
+  </>
+);
 
 export const PopupContent = (props: PopupContentProps): JSX.Element => {
   const {
@@ -286,7 +280,7 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
   };
 
   const handleCreateButton = async (): Promise<void> => {
-    let pageMetadata = await getPageMetadata();
+    const pageMetadata = await getPageMetadata();
     if (pageMetadata === null) {
       setTitle('');
       setDescription('');

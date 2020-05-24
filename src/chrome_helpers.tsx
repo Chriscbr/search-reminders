@@ -1,5 +1,5 @@
-const promisify = (fn: Function, ...params: unknown[]): Promise<unknown> => {
-  return new Promise((resolve, reject): void =>
+const promisify = (fn: Function, ...params: unknown[]): Promise<unknown> =>
+  new Promise((resolve, reject): void =>
     fn.apply(
       null,
       params.concat((result: unknown) => {
@@ -10,12 +10,11 @@ const promisify = (fn: Function, ...params: unknown[]): Promise<unknown> => {
       }),
     ),
   );
-};
 
 export const chromeRuntimeSendMessageToContentScript = (
   message: object,
-): Promise<unknown> => {
-  return new Promise((resolve, reject): void => {
+): Promise<unknown> =>
+  new Promise((resolve, reject): void => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0].id === undefined) {
         return reject('Tab id is undefined.');
@@ -28,28 +27,22 @@ export const chromeRuntimeSendMessageToContentScript = (
       });
     });
   });
-};
 
-export const chromeRuntimeSendMessage = (message: object): Promise<unknown> => {
-  return promisify(chrome.runtime.sendMessage.bind(chrome.runtime), message);
-};
+export const chromeRuntimeSendMessage = (message: object): Promise<unknown> =>
+  promisify(chrome.runtime.sendMessage.bind(chrome.runtime), message);
 
-export const chromeStorageSyncSet = (items: object): Promise<unknown> => {
-  return promisify(chrome.storage.sync.set.bind(chrome.storage.sync), items);
-};
+export const chromeStorageSyncSet = (items: object): Promise<unknown> =>
+  promisify(chrome.storage.sync.set.bind(chrome.storage.sync), items);
 
 export const chromeStorageSyncGet = (
   keys: string | string[],
-): Promise<unknown> => {
-  return promisify(chrome.storage.sync.get.bind(chrome.storage.sync), keys);
-};
+): Promise<unknown> =>
+  promisify(chrome.storage.sync.get.bind(chrome.storage.sync), keys);
 
-export const chromeStorageSyncClear = (): Promise<unknown> => {
-  return promisify(chrome.storage.sync.clear.bind(chrome.storage.sync));
-};
+export const chromeStorageSyncClear = (): Promise<unknown> =>
+  promisify(chrome.storage.sync.clear.bind(chrome.storage.sync));
 
-export const chromeTabsQuery = (query: object): Promise<chrome.tabs.Tab[]> => {
-  return promisify(chrome.tabs.query.bind(chrome.tabs), query) as Promise<
+export const chromeTabsQuery = (query: object): Promise<chrome.tabs.Tab[]> =>
+  promisify(chrome.tabs.query.bind(chrome.tabs), query) as Promise<
     chrome.tabs.Tab[]
   >;
-};

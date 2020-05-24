@@ -21,13 +21,13 @@ import 'typeface-roboto';
 const getCurrentPageReminder = async (): Promise<
   [string | null, Reminder | null]
 > => {
-  let tabs = await chromeTabsQuery({ active: true, lastFocusedWindow: true });
+  const tabs = await chromeTabsQuery({ active: true, lastFocusedWindow: true });
   const url = tabs[0].url;
   if (url === undefined) {
     return [null, null];
   }
   console.log(`Sending request getReminderFromURL with url: ${url}.`);
-  let response = (await chromeRuntimeSendMessage({
+  const response = (await chromeRuntimeSendMessage({
     operation: RequestOperation.GetReminderFromURL,
     url: url,
   })) as string;

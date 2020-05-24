@@ -25,12 +25,11 @@ const getSearchQuery = (): string => {
  * Removes all non-alphanumeric characters and mixed whitespace characters.
  * @param query a search query, e.g. "chocolate chip cookies"
  */
-const getKeywordsFromQuery = (query: string): string[] => {
-  return query
+const getKeywordsFromQuery = (query: string): string[] =>
+  query
     .replace(/[^\w\s]/g, '')
     .replace(/\s+/g, ' ')
     .split(' ');
-};
 
 /**
  * Sends a message to the `background.js` script to obtain a list of relevant

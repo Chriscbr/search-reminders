@@ -82,36 +82,36 @@ want to test changes, by clicking on the refresh button on
 ## Project structure
 
 ```markdown
-- README.md - This file you are reading.
-- dist - The build output, which can be loaded into Chrome
-- node_modules - Stores dependency code during development
-- package-lock.json - Dependency metadata (do not manually edit)
-- package.json - General metadata and dependency list
-- .eslintrc.js - Settings for the ESLint tool
-- .eslintignore - List of files/directories for ESLint to ignore
-- .prettierrc.js - Settings for Prettier (automatic code formatting)
-- .travis.yml - Settings for Travis (automatic CI/CD / testing)
-- tsconfig.json - Settings for compiling TypeScript to JavaScript
-- public - Non-JS assets used by the extension
-  - images - Icons and such
-  - manifest.json - Chrome extension metadata information
-  - options.html - HTML layout for options page
-  - popup.html - HTML layout for popup
-- src - Source code
-  - components/ - Folder containing all React components
-  - background.tsx - Code that runs in the background and stores data
-  - chrome_helpers.tsx - Wrapper functions for Chrome APIs
-  - common.tsx - Code that is shared between modules
-  - content_script.tsx - Code that gets injected to google.com/search
-  - get_metadata.tsx - Code that gets injected to all pages
-  - options.tsx - Code that runs on the options page
-  - popup.tsx - Code that runs on the popup
-  - utils.tsx - Helper functions
-  - testData.json - Test data
-- webpack - Settings for bundling all files into an extension
-  - webpack.common.js - General bundling settings
-  - webpack.dev.js - Bundling settings for "watch" script
-  - webpack.prod.js - Bundling settings for "build" script
+├── README.md               - This file you are reading.
+├── dist                    - The build output, which can be loaded into Chrome
+├── node_modules            - Stores dependency code during development
+├── package-lock.json       - Dependency metadata (do not manually edit)
+├── package.json            - General metadata and dependency list
+├── .eslintrc.js            - Settings for the ESLint tool
+├── .eslintignore           - List of files/directories for ESLint to ignore
+├── .prettierrc.js          - Settings for Prettier (automatic code formatting)
+├── .travis.yml             - Settings for Travis (automatic CI/CD / testing)
+├── tsconfig.json           - Settings for compiling TypeScript to JavaScript
+├── public                  - Non-JS assets used by the extension
+│   ├── images              - Icons and such
+│   ├── manifest.json       - Chrome extension metadata information
+│   ├── options.html        - HTML layout for options page
+│   └── popup.html          - HTML layout for popup
+├── src                     - Source code
+│   ├── components/         - Folder containing all React components
+│   ├── background.tsx      - Code that runs in the background and stores data
+│   ├── chrome_helpers.tsx  - Wrapper functions for Chrome APIs
+│   ├── common.tsx          - Code that is shared between modules
+│   ├── content_script.tsx  - Code that gets injected to google.com/search
+│   ├── get_metadata.tsx    - Code that gets injected to all pages
+│   ├── options.tsx         - Code that runs on the options page
+│   ├── popup.tsx           - Code that runs on the popup
+|   ├── utils.tsx           - Helper functions
+│   ├── testData.json       - Test data
+└── webpack                 - Settings for bundling all files into an extension
+    ├── webpack.common.js   - General bundling settings
+    ├── webpack.dev.js      - Bundling settings for "watch" script
+    └── webpack.prod.js     - Bundling settings for "build" script
 ```
 
 ## Architecture

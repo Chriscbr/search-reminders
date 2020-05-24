@@ -46,7 +46,6 @@ module.exports = {
       },
     ],
     'prefer-spread': 'off',
-    'func-style': 'expression',
   },
   settings: {
     react: {
