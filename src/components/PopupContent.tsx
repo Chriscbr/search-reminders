@@ -74,13 +74,12 @@ type PopupContentProps = {
   pageMetadata: PageMetadata;
 };
 
-// TODO: add functionality to add page to reminders
-const renderEmptyMode = function (
+const renderEmptyMode = (
   handleCreateButton: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void,
   classes: Record<string, string>,
-): JSX.Element {
+): JSX.Element => {
   return (
     <Box className={classes.box}>
       <Typography align="center" component="p">
@@ -102,7 +101,7 @@ const renderEmptyMode = function (
   );
 };
 
-const renderEditingMode = function (
+const renderEditingMode = (
   title: string,
   description: string,
   keywords: string[],
@@ -117,7 +116,7 @@ const renderEditingMode = function (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void,
   classes: Record<string, string>,
-): JSX.Element {
+): JSX.Element => {
   return (
     <>
       <Box className={classes.boxMiddle}>
@@ -170,7 +169,7 @@ const renderEditingMode = function (
   );
 };
 
-const renderSavedMode = function (
+const renderSavedMode = (
   title: string,
   description: string,
   keywords: string[],
@@ -181,7 +180,7 @@ const renderSavedMode = function (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void,
   classes: Record<string, string>,
-): JSX.Element {
+): JSX.Element => {
   return (
     <>
       <Box className={classes.boxMiddle}>
@@ -217,7 +216,7 @@ const renderSavedMode = function (
   );
 };
 
-export const PopupContent = function (props: PopupContentProps): JSX.Element {
+export const PopupContent = (props: PopupContentProps): JSX.Element => {
   const {
     initTitle,
     initDescription,

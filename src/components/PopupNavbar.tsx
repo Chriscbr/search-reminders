@@ -30,7 +30,7 @@ const useStyles = makeStyles({
  * Note: even though most "navbars" appear at the top or side of a webpage,
  * this one appears at the bottom of the popup.
  */
-export const PopupNavbar = function (): JSX.Element {
+export const PopupNavbar = (): JSX.Element => {
   const classes = useStyles();
   return (
     <Grid container className={classes.container}>

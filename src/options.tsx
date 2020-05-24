@@ -4,7 +4,7 @@ import { chromeRuntimeSendMessage } from './chrome_helpers';
 import { Reminder, RequestOperation } from './common';
 import { SavedRemindersView } from './components/SavedRemindersView';
 
-const addTestDataButtonHandler = function (): void {
+const addTestDataButtonHandler = (): void => {
   chromeRuntimeSendMessage({ operation: RequestOperation.AddTestData })
     .then((response) => {
       if (response === 'SUCCESS') {
@@ -16,7 +16,7 @@ const addTestDataButtonHandler = function (): void {
     .catch((error) => console.error(error));
 };
 
-const deleteSavedDataButtonHandler = function (): void {
+const deleteSavedDataButtonHandler = (): void => {
   chromeRuntimeSendMessage({ operation: RequestOperation.DeleteUserData })
     .then((response) => {
       if (response === 'SUCCESS') {
@@ -28,11 +28,11 @@ const deleteSavedDataButtonHandler = function (): void {
     .catch((error) => console.error(error));
 };
 
-const setupEventListener = function (
+const setupEventListener = (
   elemId: string,
   event: string,
   handler: () => unknown,
-): void {
+): void => {
   const elem = document.getElementById(elemId);
   if (elem === null) {
     throw new Error("Delete data button can't be found");
@@ -40,7 +40,7 @@ const setupEventListener = function (
   elem.addEventListener(event, handler);
 };
 
-const setupEventListeners = function (): void {
+const setupEventListeners = (): void => {
   setupEventListener('addTestData', 'click', addTestDataButtonHandler);
   setupEventListener('deleteSavedData', 'click', deleteSavedDataButtonHandler);
 };
@@ -50,7 +50,7 @@ setupEventListeners();
 /**
  * Get a list of all of the reminders the user has saved.
  */
-const getAllReminders = function (): Promise<Reminder[] | null> {
+const getAllReminders = (): Promise<Reminder[] | null> => {
   return chromeRuntimeSendMessage({
     operation: RequestOperation.GetAllReminders,
   })

@@ -47,7 +47,7 @@ type ReminderItemProps = {
   deleteButtonHandler: (event: React.MouseEvent, reminderId: number) => void;
 };
 
-export const ReminderItem = function (props: ReminderItemProps): JSX.Element {
+export const ReminderItem = (props: ReminderItemProps): JSX.Element => {
   const classes = useStyles();
   const { reminder, deleteButtonHandler } = props;
 

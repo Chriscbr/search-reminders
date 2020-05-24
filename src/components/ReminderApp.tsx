@@ -8,9 +8,7 @@ type ReminderAppProps = {
   initReminders: Reminder[];
 };
 
-export const ReminderApp = function (
-  props: ReminderAppProps,
-): JSX.Element | null {
+export const ReminderApp = (props: ReminderAppProps): JSX.Element | null => {
   const [reminders, setReminders] = useState(props.initReminders);
 
   const deleteButtonHandler = (

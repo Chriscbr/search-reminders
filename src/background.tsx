@@ -21,9 +21,9 @@ import {
 } from './chrome_helpers';
 import rawTestData from './testData.json';
 
-const saveLocalDataToStorage = function (
+const saveLocalDataToStorage = (
   reminderStore: ReminderStore,
-): Promise<unknown> {
+): Promise<unknown> => {
   const reminders = reminderStore.values();
   console.log(
     'Saving local data to storage, with the following list of reminders:',
@@ -36,8 +36,8 @@ const saveLocalDataToStorage = function (
   return chromeStorageSyncSet(userData);
 };
 
-const loadDataFromStorage = function (): Promise<UserData> {
-  return chromeStorageSyncGet(['reminders', 'currentId'])
+const loadDataFromStorage = (): Promise<UserData> =>
+  chromeStorageSyncGet(['reminders', 'currentId'])
     .then((response) => {
       const data = response as UserDataJSON;
       const reminders = data.reminders.map((value: string) =>
@@ -62,14 +62,13 @@ const loadDataFromStorage = function (): Promise<UserData> {
           return { reminders: [], currentId: 0 };
         });
     });
-};
 
-const addReminders = function (
+const addReminders = (
   reminders: Reminder[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
-): void {
+): void => {
   reminders.forEach((reminder, _index) => {
     reminderStore.add(reminder);
     keywordMap.add(reminder);
@@ -77,12 +76,12 @@ const addReminders = function (
   });
 };
 
-const addRemindersWithoutIds = function (
+const addRemindersWithoutIds = (
   testData: ReminderParams[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
-): number[] {
+): number[] => {
   const reminderIds: number[] = []; // keep track of the reminderIds generated
   testData.forEach((params, _index) => {
     const reminder = reminderStore.create(params);
@@ -93,7 +92,7 @@ const addRemindersWithoutIds = function (
   return reminderIds;
 };
 
-const updateReminder = function (
+const updateReminder = (
   id: number,
   url: string,
   title: string,
@@ -102,7 +101,7 @@ const updateReminder = function (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
-): void {
+): void => {
   // First, calculate the 'difference' between the current and updated keywords
   let reminder = reminderStore.getReminder(id);
   if (reminder === undefined) {
@@ -123,12 +122,12 @@ const updateReminder = function (
   reminderURLMap.add(reminder);
 };
 
-const deleteReminder = function (
+const deleteReminder = (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
   reminderId: number,
-): void {
+): void => {
   console.log('Contents of reminderStore prior to deletion:');
   console.log(reminderStore);
   const reminder = reminderStore.remove(reminderId);
@@ -136,11 +135,11 @@ const deleteReminder = function (
   reminderURLMap.remove(reminder);
 };
 
-const deleteAllLocalData = function (
+const deleteAllLocalData = (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
-): void {
+): void => {
   reminderStore.clear();
   keywordMap.clear();
   reminderURLMap.clear();
@@ -157,12 +156,12 @@ const deleteAllLocalData = function (
  * @param reminderStore reference to reminder store
  * @param sendResponse callback function for sending the response message
  */
-const handleGetRemindersByKeywords = function (
+const handleGetRemindersByKeywords = (
   request: GetRemindersByKeywordsRequest,
   keywordMap: KeywordMap,
   reminderStore: ReminderStore,
   sendResponse: (args?: unknown) => void,
-): void {
+): void => {
   const keywords: string[] = request.keywords;
 
   // Set, not a list, in order to avoid duplicate reminder IDs
@@ -210,13 +209,13 @@ const handleGetRemindersByKeywords = function (
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
  */
-const handleAddTestData = function (
+const handleAddTestData = (
   testData: ReminderParams[],
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
-): void {
+): void => {
   addRemindersWithoutIds(testData, reminderStore, keywordMap, reminderURLMap);
   saveLocalDataToStorage(reminderStore)
     .then(() => {
@@ -241,12 +240,12 @@ const handleAddTestData = function (
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
  */
-const handleDeleteUserData = function (
+const handleDeleteUserData = (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
-): void {
+): void => {
   deleteAllLocalData(reminderStore, keywordMap, reminderURLMap);
   chromeStorageSyncClear()
     .then(() => {
@@ -272,13 +271,13 @@ const handleDeleteUserData = function (
  * @param keywordMap reference to keyword map
  * @param sendResponse callback function for sending the response message
  */
-const handleSaveReminder = function (
+const handleSaveReminder = (
   request: SaveReminderRequest,
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
-): void {
+): void => {
   let reminderId: number;
   if (request.reminderId === null) {
     const reminderIds = addRemindersWithoutIds(
@@ -331,13 +330,13 @@ const handleSaveReminder = function (
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
  */
-const handleDeleteReminder = function (
+const handleDeleteReminder = (
   request: DeleteReminderRequest,
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
-): void {
+): void => {
   deleteReminder(reminderStore, keywordMap, reminderURLMap, request.reminderId);
   saveLocalDataToStorage(reminderStore)
     .then(() => {
@@ -363,12 +362,12 @@ const handleDeleteReminder = function (
  * @param reminderURLMap reference to reminder URL map
  * @param sendResponse callback function for sending the response message
  */
-const handleGetReminderFromURL = function (
+const handleGetReminderFromURL = (
   request: GetReminderFromURLRequest,
   reminderStore: ReminderStore,
   reminderURLMap: ReminderURLMap,
   sendResponse: (args?: unknown) => void,
-): void {
+): void => {
   const reminderId = reminderURLMap.get(request.url);
   if (reminderId === undefined) {
     console.log(
@@ -395,10 +394,10 @@ const handleGetReminderFromURL = function (
  * @param reminderStore reference to reminder store
  * @param sendResponse callback function for sending the response message
  */
-const handleGetAllReminders = function (
+const handleGetAllReminders = (
   reminderStore: ReminderStore,
   sendResponse: (args?: unknown) => void,
-): void {
+): void => {
   const reminders = reminderStore.values();
   sendResponse(reminders);
 };
@@ -413,98 +412,96 @@ const handleGetAllReminders = function (
  * @param reminderURLMap reference to URL map
  * @param testData a list of test data
  */
-const addMessageListener = function (
+const addMessageListener = (
   reminderStore: ReminderStore,
   keywordMap: KeywordMap,
   reminderURLMap: ReminderURLMap,
   testData: ReminderParams[],
-): void {
-  chrome.runtime.onMessage.addListener(function (
-    request: Request,
-    sender,
-    sendResponse,
-  ) {
-    console.log(
-      sender.tab
-        ? `Received message from a content script: ${sender.tab.url}`
-        : 'Received message from the extension.',
-    );
-    console.log(`Message operation: ${request.operation}`);
+): void => {
+  chrome.runtime.onMessage.addListener(
+    (request: Request, sender, sendResponse) => {
+      console.log(
+        sender.tab
+          ? `Received message from a content script: ${sender.tab.url}`
+          : 'Received message from the extension.',
+      );
+      console.log(`Message operation: ${request.operation}`);
 
-    switch (request.operation) {
-      case RequestOperation.AddTestData:
-        handleAddTestData(
-          testData,
-          reminderStore,
-          keywordMap,
-          reminderURLMap,
-          sendResponse,
-        );
-        break;
-      case RequestOperation.DeleteUserData:
-        handleDeleteUserData(
-          reminderStore,
-          keywordMap,
-          reminderURLMap,
-          sendResponse,
-        );
-        break;
-      case RequestOperation.SaveReminder:
-        handleSaveReminder(
-          request,
-          reminderStore,
-          keywordMap,
-          reminderURLMap,
-          sendResponse,
-        );
-        break;
-      case RequestOperation.DeleteReminder:
-        handleDeleteReminder(
-          request,
-          reminderStore,
-          keywordMap,
-          reminderURLMap,
-          sendResponse,
-        );
-        break;
-      case RequestOperation.GetReminderFromURL:
-        handleGetReminderFromURL(
-          request,
-          reminderStore,
-          reminderURLMap,
-          sendResponse,
-        );
-        break;
-      case RequestOperation.GetRemindersByKeywords:
-        handleGetRemindersByKeywords(
-          request,
-          keywordMap,
-          reminderStore,
-          sendResponse,
-        );
-        break;
-      case RequestOperation.GetAllReminders:
-        handleGetAllReminders(reminderStore, sendResponse);
-        break;
-      case RequestOperation.GetPageMetadata:
-        console.log("Received operation 'GetPageMetadata'. Ignoring.");
-        break;
-      default:
-        sendResponse('Error, invalid request operation received.');
-        console.error('Error, invalid request operation received.');
+      switch (request.operation) {
+        case RequestOperation.AddTestData:
+          handleAddTestData(
+            testData,
+            reminderStore,
+            keywordMap,
+            reminderURLMap,
+            sendResponse,
+          );
+          break;
+        case RequestOperation.DeleteUserData:
+          handleDeleteUserData(
+            reminderStore,
+            keywordMap,
+            reminderURLMap,
+            sendResponse,
+          );
+          break;
+        case RequestOperation.SaveReminder:
+          handleSaveReminder(
+            request,
+            reminderStore,
+            keywordMap,
+            reminderURLMap,
+            sendResponse,
+          );
+          break;
+        case RequestOperation.DeleteReminder:
+          handleDeleteReminder(
+            request,
+            reminderStore,
+            keywordMap,
+            reminderURLMap,
+            sendResponse,
+          );
+          break;
+        case RequestOperation.GetReminderFromURL:
+          handleGetReminderFromURL(
+            request,
+            reminderStore,
+            reminderURLMap,
+            sendResponse,
+          );
+          break;
+        case RequestOperation.GetRemindersByKeywords:
+          handleGetRemindersByKeywords(
+            request,
+            keywordMap,
+            reminderStore,
+            sendResponse,
+          );
+          break;
+        case RequestOperation.GetAllReminders:
+          handleGetAllReminders(reminderStore, sendResponse);
+          break;
+        case RequestOperation.GetPageMetadata:
+          console.log("Received operation 'GetPageMetadata'. Ignoring.");
+          break;
+        default:
+          sendResponse('Error, invalid request operation received.');
+          console.error('Error, invalid request operation received.');
 
-        // By adding this custom exception (which takes type 'never' as
-        // its argument), the compiler should complain if we ever add a new
-        // variant to RequestOperation without adding a case to this switch
-        // statement.
-        throw new UnreachableCaseError(request);
-    }
+          // By adding this custom exception (which takes type 'never' as
+          // its argument), the compiler should complain if we ever add a new
+          // variant to RequestOperation without adding a case to this switch
+          // statement.
+          throw new UnreachableCaseError(request);
+      }
 
-    // returning 'true' in the chrome.runtime.onMessage.addListener API
-    // indicates that we want sendResponse to support asynchronous responses;
-    // without this the message port will close too quickly
-    return true;
-  });
+      // returning 'true' in the chrome.runtime.onMessage.addListener API
+      // indicates that we want sendResponse to support asynchronous responses;
+      // without this the message port will close too quickly
+      return true;
+    },
+  );
 };
 
 // Initialize ReminderStore, KeywordMap, and ReminderURLMap by loading data
@@ -541,18 +538,20 @@ loadDataFromStorage().then((data: UserData) => {
     });
   };
 
-  chrome.tabs.onActivated.addListener(function (_details) {
+  chrome.tabs.onActivated.addListener((_details) => {
     console.log('onActivated listener injecting get_metadata script.');
     runGetMetadataScript();
   });
-  chrome.tabs.onUpdated.addListener(function (
-    _tabId: number,
-    changeInfo: chrome.tabs.TabChangeInfo,
-    _tab: chrome.tabs.Tab,
-  ) {
-    if (changeInfo.status === 'complete') {
-      console.log('onUpdated listener injecting get_metadata script.');
-      runGetMetadataScript();
-    }
-  });
+  chrome.tabs.onUpdated.addListener(
+    (
+      _tabId: number,
+      changeInfo: chrome.tabs.TabChangeInfo,
+      _tab: chrome.tabs.Tab,
+    ) => {
+      if (changeInfo.status === 'complete') {
+        console.log('onUpdated listener injecting get_metadata script.');
+        runGetMetadataScript();
+      }
+    },
+  );
 });

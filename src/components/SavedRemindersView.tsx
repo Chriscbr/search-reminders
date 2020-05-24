@@ -6,14 +6,14 @@ type SavedRemindersViewProps = {
   getAllReminders: () => Promise<Reminder[] | null>;
 };
 
-export const SavedRemindersView = function (
+export const SavedRemindersView = (
   props: SavedRemindersViewProps,
-): JSX.Element | null {
+): JSX.Element | null => {
   const [reminders, setReminders] = useState(null as Reminder[] | null);
   const { getAllReminders } = props;
 
   useEffect(() => {
-    (async function (): Promise<void> {
+    (async (): Promise<void> => {
       const response = await getAllReminders();
       setReminders(response);
     })();

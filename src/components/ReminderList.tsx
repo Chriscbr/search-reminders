@@ -46,15 +46,15 @@ type ReminderListProps = {
   deleteButtonHandler: (event: React.MouseEvent, reminderId: number) => void;
 };
 
-export const ReminderList = function (props: ReminderListProps): JSX.Element {
+export const ReminderList = (props: ReminderListProps): JSX.Element => {
   const classes = useStyles();
   const { reminders, deleteButtonHandler } = props;
 
   const [expanded, setExpanded] = useState(true);
 
-  function handleExpandClick(): void {
+  const handleExpandClick = (): void => {
     setExpanded(!expanded);
-  }
+  };
 
   const reminderItems = reminders.map((reminder) => (
     <ReminderItem

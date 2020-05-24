@@ -4,8 +4,8 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'prettier/@typescript-eslint',  // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
-    'plugin:prettier/recommended',  // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
+    'prettier/@typescript-eslint', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
+    'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
   parserOptions: {
     tsconfigRootDir: __dirname,
@@ -19,25 +19,30 @@ module.exports = {
   rules: {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/array-type": ["error", { "default": "array-simple" }],
-    "arrow-body-style": ["error", "as-needed"],
+    '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
+    'arrow-body-style': ['error', 'as-needed'],
 
-    "@typescript-eslint/ban-types": ["error",
+    '@typescript-eslint/ban-types': [
+      'error',
       {
-        "types": {
-          "Object": "Use {} instead.",
-          "String": "Use 'string' instead.",
-          "Number": "Use 'number' instead.",
-          "Boolean": "Use 'boolean' instead",
-        }
-      }
+        types: {
+          Object: 'Use {} instead.',
+          String: "Use 'string' instead.",
+          Number: "Use 'number' instead.",
+          Boolean: "Use 'boolean' instead",
+        },
+      },
     ],
 
-    "@typescript-eslint/class-name-casing": ["error"],
+    '@typescript-eslint/class-name-casing': ['error'],
 
     // allow unused variables starting with an underscore
-    "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
-    "prefer-spread": "off",
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { varsIgnorePattern: '^_', argsIgnorePattern: '^_' },
+    ],
+    'prefer-spread': 'off',
+    'func-style': 'expression',
   },
   settings: {
     react: {

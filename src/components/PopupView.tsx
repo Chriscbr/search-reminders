@@ -28,7 +28,7 @@ type PopupViewProps = {
   getPageMetadata: () => Promise<PageMetadata | null>;
 };
 
-export const PopupView = function (props: PopupViewProps): JSX.Element {
+export const PopupView = (props: PopupViewProps): JSX.Element => {
   const classes = useStyles();
   const { getCurrentPageReminder, getPageMetadata } = props;
 

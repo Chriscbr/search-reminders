@@ -18,7 +18,7 @@ import 'typeface-roboto';
  *
  * @param url the URL of the current page (active tab)
  */
-const getCurrentPageReminder = function (): Promise<Reminder | null> {
+const getCurrentPageReminder = (): Promise<Reminder | null> => {
   return chromeTabsQuery({ active: true, lastFocusedWindow: true })
     .then((tabs: chrome.tabs.Tab[]) => {
       const url = tabs[0].url;
@@ -51,7 +51,7 @@ const getCurrentPageReminder = function (): Promise<Reminder | null> {
  * Obtains page metadata by sending a message to `content_script.js`, which
  * responds with a `PageMetadata` object.
  */
-const getPageMetadata = function (): Promise<PageMetadata | null> {
+const getPageMetadata = (): Promise<PageMetadata | null> => {
   console.log(`Sending request getPageMetadata to content scripts.`);
   return chromeRuntimeSendMessageToContentScript({
     operation: RequestOperation.GetPageMetadata,
