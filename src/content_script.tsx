@@ -4,6 +4,18 @@ import { Reminder, RequestOperation } from './common';
 import ReminderApp from './components/ReminderApp';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
 
+const HOSTNAMES = [
+  'www.google.com',
+  'www.google.co.uk',
+  'www.google.co.mx',
+  'www.google.ca',
+  'www.google.it',
+  'www.google.es',
+  'www.google.de',
+  'www.google.pl',
+  'www.google.jp',
+];
+
 /**
  * Get the search query from the URL of the page.
  * e.g. google.com/search?q=fresh%23cookies
@@ -93,7 +105,7 @@ const isGoogleSearchPage = (): boolean => {
   const hostname: string = document.location.hostname;
   const pathname: string = document.location.pathname;
 
-  return hostname === 'www.google.com' && pathname === '/search';
+  return HOSTNAMES.includes(hostname) && pathname === '/search';
 };
 
 // Main driver code

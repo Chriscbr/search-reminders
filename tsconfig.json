@@ -5,11 +5,7 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": [
-      "dom",
-      "es6",
-      "es2018.promise"
-    ],
+    "lib": ["dom", "es6", "es2018.promise", "ES2017"],
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
@@ -26,8 +22,6 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "es6",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "typeRoots": ["node_modules/@types"]
   }
 }

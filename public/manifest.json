@@ -2,25 +2,25 @@
   "name": "Search Reminders",
   "version": "0.1",
   "description": "Save important pages and find them through web searches!",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "<all_urls>"
-  ],
+  "permissions": ["activeTab", "storage", "<all_urls>"],
   "background": {
-    "scripts": [
-      "js/background.js"
-    ],
+    "scripts": ["js/background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
       "matches": [
-        "https://www.google.com/search*"
+        "*://www.google.com/search*",
+        "*://www.google.co.uk/search*",
+        "*://www.google.com.mx/search*",
+        "*://www.google.ca/search*",
+        "*://www.google.it/search*",
+        "*://www.google.es/search*",
+        "*://www.google.de/search*",
+        "*://www.google.pl/search*",
+        "*://www.google.jp/search*"
       ],
-      "js": [
-        "js/content_script.js"
-      ]
+      "js": ["js/content_script.js"]
     }
   ],
   "options_page": "options.html",
