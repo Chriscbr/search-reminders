@@ -22,7 +22,9 @@ const addMessageListener = (): void => {
       const keywordsTag: MetaTag | null = document.head.querySelector(
         '[name~=keywords][content]',
       );
-      const keywords: string[] = keywordsTag?.content.split(',') || [];
+      const keywords: string[] =
+        keywordsTag?.content.split(',').map((str) => str.toLocaleLowerCase()) ||
+        [];
 
       console.log(`Generated title: ${title}`);
       console.log(`Generated URL: ${url}`);
