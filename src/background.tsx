@@ -92,11 +92,11 @@ const updateReminder = (
     throw new Error(`Reminder ID not found in reminderStore: ${id}`);
   }
   const priorKeywords = reminder.keywords;
-  const addedKeywords = keywords.filter(
-    (keyword) => priorKeywords.indexOf(keyword) === -1,
+  const addedKeywords = keywords.filter((keyword) =>
+    priorKeywords.includes(keyword),
   );
-  const removedKeywords = priorKeywords.filter(
-    (keyword) => keywords.indexOf(keyword) === -1,
+  const removedKeywords = priorKeywords.filter((keyword) =>
+    keywords.includes(keyword),
   );
 
   // Update all data structures
