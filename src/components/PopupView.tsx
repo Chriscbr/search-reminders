@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 
 type PopupViewProps = {
   getCurrentPageReminder: () => Promise<[string | null, Reminder | null]>;
-  getPageMetadata: () => Promise<PageMetadata | null>;
+  getPageMetadata: () => Promise<PageMetadata>;
 };
 
 /*

@@ -45,20 +45,13 @@ const getCurrentPageReminder = async (): Promise<
  * Obtains page metadata by sending a message to `content_script.js`, which
  * responds with a `PageMetadata` object.
  */
-const getPageMetadata = (): Promise<PageMetadata | null> => {
-  console.log(`Sending request getPageMetadata to content scripts.`);
-  return chromeRuntimeSendMessageToContentScript({
+const getPageMetadata = async (): Promise<PageMetadata> => {
+  console.log('Sending request getPageMetadata to content scripts.');
+  const pageMetadata = (await chromeRuntimeSendMessageToContentScript({
     operation: RequestOperation.GetPageMetadata,
-  })
-    .then((response) => {
-      console.log(`Received getPageMetdata response:`);
-      console.log(response);
-      return response as PageMetadata;
-    })
-    .catch((error) => {
-      console.error(error);
-      return null;
-    });
+  })) as PageMetadata;
+  console.log('Received getPageMetdata response:', pageMetadata);
+  return pageMetadata;
 };
 
 const popupView = (

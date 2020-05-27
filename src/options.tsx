@@ -50,18 +50,12 @@ setupEventListeners();
 /**
  * Get a list of all of the reminders the user has saved.
  */
-const getAllReminders = (): Promise<Reminder[] | null> =>
-  chromeRuntimeSendMessage({
+const getAllReminders = async (): Promise<Reminder[] | null> => {
+  const data = (await chromeRuntimeSendMessage({
     operation: RequestOperation.GetAllReminders,
-  })
-    .then((response) => {
-      const data = response as string[];
-      return data.map((value: string) => Reminder.fromJSON(value));
-    })
-    .catch((err) => {
-      console.error(err);
-      return null;
-    });
+  })) as string[];
+  return data.map((value: string) => Reminder.fromJSON(value));
+};
 
 const savedRemindersView = (
   <SavedRemindersView getAllReminders={getAllReminders} />

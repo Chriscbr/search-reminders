@@ -36,18 +36,18 @@ const getKeywordsFromQuery = (query: string): string[] =>
  * Reminders given a sequence of keywords.
  * @param keywords a sequence of keywords
  */
-const requestRelevantReminders = (keywords: string[]): Promise<Reminder[]> => {
+const requestRelevantReminders = async (
+  keywords: string[],
+): Promise<Reminder[]> => {
   console.log('Sending a request for relevant reminders.');
-  return chromeRuntimeSendMessage({
+  const data = (await chromeRuntimeSendMessage({
     operation: RequestOperation.GetRemindersByKeywords,
     keywords: keywords,
-  }).then((response) => {
-    const data = response as { reminders: string[] };
-    const reminders = data.reminders.map((value: string) =>
-      Reminder.fromJSON(value),
-    );
-    return reminders;
-  });
+  })) as { reminders: string[] };
+  const reminders = data.reminders.map((value: string) =>
+    Reminder.fromJSON(value),
+  );
+  return reminders;
 };
 
 /**

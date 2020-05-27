@@ -36,32 +36,16 @@ const saveLocalDataToStorage = (
   return chromeStorageSyncSet(userData);
 };
 
-const loadDataFromStorage = (): Promise<UserData> =>
-  chromeStorageSyncGet(['reminders', 'currentId'])
-    .then((response) => {
-      const data = response as UserDataJSON;
-      const reminders = data.reminders.map((value: string) =>
-        Reminder.fromJSON(value),
-      );
-      return { reminders: reminders, currentId: data.currentId };
-    })
-    .catch((error) => {
-      console.log(`Data not found in storage, possible error: ${error}`);
-      console.log('Initializing with empty data.');
-      return saveLocalDataToStorage(new ReminderStore(0))
-        .then(() => {
-          console.log(
-            'Successfully initialized empty reminder list to local storage.',
-          );
-          return { reminders: [], currentId: 0 };
-        })
-        .catch((error) => {
-          console.log('Unable to save empty user data to local storage.');
-          console.log(`Received error message: ${error}`);
-          console.log('Resuming with temporary empty user data.');
-          return { reminders: [], currentId: 0 };
-        });
-    });
+const loadDataFromStorage = async (): Promise<UserData> => {
+  const data = (await chromeStorageSyncGet([
+    'reminders',
+    'currentId',
+  ])) as UserDataJSON;
+  const reminders = data.reminders.map((value: string) =>
+    Reminder.fromJSON(value),
+  );
+  return { reminders: reminders, currentId: data.currentId };
+};
 
 const addReminders = (
   reminders: Reminder[],

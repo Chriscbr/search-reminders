@@ -72,7 +72,7 @@ type PopupContentProps = {
   initReminderId: number | null;
   initURL: string;
   initMode: PopupContentMode;
-  getPageMetadata: () => Promise<PageMetadata | null>;
+  getPageMetadata: () => Promise<PageMetadata>;
 };
 
 const renderEmptyMode = (
@@ -280,15 +280,21 @@ export const PopupContent = (props: PopupContentProps): JSX.Element => {
   };
 
   const handleCreateButton = async (): Promise<void> => {
-    const pageMetadata = await getPageMetadata();
-    if (pageMetadata === null) {
-      setTitle('');
-      setDescription('');
-      setKeywords([]);
-    } else {
+    // There's at least a dozen ways this control flow could have been written
+    // (e.g. by extending the await with .catch(() => null)) perhaps).
+    // I think this one is the cleanest, even though I think I would prefer
+    // the try..catch to only be wrapping the single await operation that
+    // can fail - but I suppose it's a matter of taste.
+    try {
+      const pageMetadata = await getPageMetadata();
       setTitle(pageMetadata.title);
       setDescription(pageMetadata.description);
       setKeywords(pageMetadata.keywords);
+    } catch {
+      console.log('An error getting page metadata.');
+      setTitle('');
+      setDescription('');
+      setKeywords([]);
     }
     setMode('editing');
   };
