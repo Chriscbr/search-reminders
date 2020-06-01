@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Reminder, RequestOperation } from './common';
 import ReminderApp from './components/ReminderApp';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
+import { collectWordStems } from './utils';
 
 const HOSTNAMES = [
   'www.google.com',
@@ -86,7 +87,10 @@ const setupInjectionPoint = (): HTMLDivElement => {
 
 const injectRemindersList = (): void => {
   const keywords: string[] = getKeywordsFromQuery(getSearchQuery());
-  console.log(`Keywords found: ${keywords}`);
+  console.log('Keywords found:', keywords);
+
+  const keywordStems: Set<string> = new Set(collectWordStems(keywords));
+  console.log('Keyword stems found:', keywordStems);
 
   requestRelevantReminders(keywords)
     .then((reminders) => {

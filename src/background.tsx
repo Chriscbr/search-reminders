@@ -13,7 +13,7 @@ import {
   GetRemindersByKeywordsRequest,
   SaveReminderRequest,
 } from './common';
-import { UnreachableCaseError } from './utils';
+import { UnreachableCaseError, collectWordStems } from './utils';
 import {
   chromeStorageSyncSet,
   chromeStorageSyncGet,
@@ -92,11 +92,11 @@ const updateReminder = (
     throw new Error(`Reminder ID not found in reminderStore: ${id}`);
   }
   const priorKeywords = reminder.keywords;
-  const addedKeywords = keywords.filter((keyword) =>
-    priorKeywords.includes(keyword),
+  const addedKeywords = keywords.filter(
+    (keyword) => !priorKeywords.includes(keyword),
   );
-  const removedKeywords = priorKeywords.filter((keyword) =>
-    keywords.includes(keyword),
+  const removedKeywords = priorKeywords.filter(
+    (keyword) => !keywords.includes(keyword),
   );
 
   // Update all data structures
@@ -147,12 +147,14 @@ const handleGetRemindersByKeywords = (
   sendResponse: (args?: unknown) => void,
 ): void => {
   const keywords: string[] = request.keywords;
+  const keywordStems: Set<string> = new Set(collectWordStems(keywords));
+  console.log('Looking for reminders with keywords:', keywords, keywordStems);
 
   // Set, not a list, in order to avoid duplicate reminder IDs
   const reminderIds: Set<number> = new Set();
 
   // Collect all of the reminder IDs related to any of the keywords
-  keywords.forEach((keyword) => {
+  [...keywords, ...keywordStems].forEach((keyword) => {
     const keywordIds = keywordMap.get(keyword);
     if (keywordIds !== undefined) {
       keywordIds.forEach((id) => {

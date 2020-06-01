@@ -54,7 +54,6 @@ want to test changes, by clicking on the refresh button on
   first page of results
 - [Low]: Add logging infrastructure? Enable/disable logging with a setting?
 - [Low]: Read about Redux, and evaluate if it would be useful for this project
-- [Med]: Update extension icons
 - [Low]: Look into code splitting to improve bundle sizes? (see
   <https://reactjs.org/docs/code-splitting.html>)
 - [Med]: Consider combining ReminderMap, ReminderURLMap, and KeywordMap into
@@ -66,18 +65,15 @@ want to test changes, by clicking on the refresh button on
   to remove the URL parameters if desired (see
   <https://stackoverflow.com/questions/6257463/how-to-get-the-url-without-any-parameters-in-javascript>)
 - [Med]: Add support for other browsers (start with Firefox?)
-- [Low]: UI Bug: After creating a new reminder, saving it will cause the word
-  "Keywords" to be crossed out. Possibly could be fixed by forcing some kind of
-  UI refresh?
 - [Med]: Decide on uniform way to handle keywords/tags? Can these be multiple
   words? Possibly should modify get_metadata script to automatically separate
   phrases into individual words. Or allow phrases (requires more logic).
-- [Low]: `get_metadata.js` may get injected to a page multiple times if the user
-  switches tabs multiple times. Is this an issue (or can this be easily fixed)?
-  Could lead to problems down the road, not sure.
 - [Low]: Consider adding some kind of different background, or accent of some
   kind using CSS to distinguish extension information from regular Google search
   results
+- [Low]: UI Bug: After creating a new reminder, saving it will cause the word
+  "Keywords" to be crossed out. Possibly could be fixed by forcing some kind of
+  UI refresh?
 
 ## Project structure
 
@@ -140,6 +136,29 @@ chrome.storage.sync.get((result) => {
   console.log(result);
 });
 ```
+
+## Libraries
+
+I've chosen to use React for mostly simple reasons - to invest more time
+learning how to architect code in the framework (since it is fairly common in
+the current web), and because it does an effective job at allowing me to
+organize the functions of most of the dynamic features of this extension.
+Also, I wished to write this extension in TypeScript (for similar reasons),
+and there is fairly solid support for React in TypeScript today.
+
+Material-UI is currently used just because it appears to be a commonly used
+React-TypeScript supporting UI framework that achieves the design goals I want,
+which are namely to have the extention's dynamic content to fit with the Google
+Search results page. I'm also making used of material-ui-chip-input, a third
+party extension that adds an important "chip" component that I use.
+
+Snowball is a word stemming library. I've chosen it just because of the very
+little bloat I think it should add to the project. I'm only using it to perform
+a single feature, so I should be able to fairly easily hot-swap it with another
+word stemming library if needed. The only downside is this library does not
+natively provide TypeScript type annotations. It also isn't perfect (ex. happy
+and happiness both get converted to "happi", but not "happier"), but it's
+good enough to provide a measurable improvement to the search features.
 
 ## Icons
 

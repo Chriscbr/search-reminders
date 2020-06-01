@@ -1,3 +1,5 @@
+import { collectWordStems } from './utils';
+
 /**
  * A collection of parameters that can be used to create a `Reminder`.
  * Unlike the `Reminder` class, a `ReminderParam` has no `id` associated, and
@@ -168,7 +170,13 @@ export class ReminderStore {
 }
 
 /**
- * Map from keywords to Reminder IDs.
+ * Map from keywords (and keyword stems) to Reminder IDs.
+ *
+ * Note: this map is not an ultimate source of truth for whether keywords
+ * are associated with reminders, since additional pseudo-keywords (such as
+ * word stems) are also included as keys. To determine if a keyword is actually
+ * associated with a Reminder, you must look up that Reminder in the
+ * ReminderStore.
  */
 export class KeywordMap {
   _data: Map<string, Set<number>>;
@@ -179,7 +187,9 @@ export class KeywordMap {
 
   add(reminder: Reminder): void {
     const reminderId = reminder.id;
-    reminder.keywords.forEach((keyword) => {
+    const baseKeywords = reminder.keywords;
+    const keywordStems = collectWordStems(baseKeywords);
+    [...baseKeywords, ...keywordStems].forEach((keyword) => {
       const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.add(reminderId);
@@ -204,7 +214,8 @@ export class KeywordMap {
     addedKeywords: string[],
     removedKeywords: string[],
   ): void {
-    addedKeywords.forEach((keyword) => {
+    const addedKeywordStems = collectWordStems(addedKeywords);
+    [...addedKeywords, ...addedKeywordStems].forEach((keyword) => {
       const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.add(reminderId);
@@ -212,7 +223,9 @@ export class KeywordMap {
         this._data.set(keyword, new Set([reminderId]));
       }
     });
-    removedKeywords.forEach((keyword) => {
+
+    const removedKeywordStems = collectWordStems(removedKeywords);
+    [...removedKeywords, ...removedKeywordStems].forEach((keyword) => {
       const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.delete(reminderId);
@@ -226,7 +239,9 @@ export class KeywordMap {
 
   remove(reminder: Reminder): void {
     const reminderId = reminder.id;
-    reminder.keywords.forEach((keyword) => {
+    const baseKeywords = reminder.keywords;
+    const keywordStems = collectWordStems(baseKeywords);
+    [...baseKeywords, ...keywordStems].forEach((keyword) => {
       const keywordIdSet = this._data.get(keyword);
       if (keywordIdSet !== undefined) {
         keywordIdSet.delete(reminderId);
