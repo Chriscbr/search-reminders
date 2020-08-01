@@ -102,7 +102,7 @@ want to test changes, by clicking on the refresh button on
 │   ├── get_metadata.tsx    - Code that gets injected to all pages
 │   ├── options.tsx         - Code that runs on the options page
 │   ├── popup.tsx           - Code that runs on the popup
-|   ├── utils.tsx           - Helper functions
+│   ├── utils.tsx           - Helper functions
 │   ├── testData.json       - Test data
 └── webpack                 - Settings for bundling all files into an extension
     ├── webpack.common.js   - General bundling settings

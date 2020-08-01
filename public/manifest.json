@@ -2,7 +2,7 @@
   "name": "Search Reminders",
   "version": "0.1",
   "description": "Save important pages and find them through web searches!",
-  "permissions": ["activeTab", "storage", "<all_urls>"],
+  "permissions": ["activeTab", "storage"],
   "background": {
     "scripts": ["js/background.js"],
     "persistent": false
@@ -38,7 +38,8 @@
     "16": "images/notebook16.png",
     "32": "images/notebook32.png",
     "48": "images/notebook48.png",
-    "128": "images/notebook128.png"
+    "128": "images/notebook128.png",
+    "512": "images/notebook512.png"
   },
   "manifest_version": 2
 }
