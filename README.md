@@ -57,8 +57,6 @@ want to test changes, by clicking on the refresh button on
 - [Med]: Hide reminder list on Google search results page if you are not on the
   first page of results
 - [Med]: Read about Redux, and evaluate if it would be useful for this project
-- [Low]: Look into code splitting to improve bundle sizes? (see
-  <https://reactjs.org/docs/code-splitting.html>)
 - [Med]: Consider combining ReminderMap, ReminderURLMap, and KeywordMap into
   some general object that can be referred to, since in most cases they act as
   a general entity where all should be updated together, etc.
