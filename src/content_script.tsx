@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Reminder, RequestOperation } from './common';
 import ReminderApp from './components/ReminderApp';
 import { chromeRuntimeSendMessage } from './chrome_helpers';
-import { collectWordStems } from './utils';
+import { collectWordStems } from './stemming';
 
 const HOSTNAMES = [
   'www.google.com',

@@ -35,6 +35,7 @@ export const KeywordChipInput = (props: KeywordChipInputProps): JSX.Element => {
       classes={{ chip: classes.chip }}
       fullWidth
       chipRenderer={({ value, className }, key): JSX.Element => (
+        // eslint-disable-next-line
         <Chip key={key} className={className} size="small" label={value} />
       )}
     />
@@ -50,6 +51,7 @@ export const KeywordChipInput = (props: KeywordChipInputProps): JSX.Element => {
       fullWidth
       chipRenderer={({ value, handleDelete, className }, key): JSX.Element => (
         <Chip
+          // eslint-disable-next-line
           key={key}
           className={className}
           size="small"

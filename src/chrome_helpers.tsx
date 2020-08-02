@@ -1,5 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-types
 const promisify = (fn: Function, ...params: unknown[]): Promise<unknown> =>
-  new Promise((resolve, reject): void =>
+  new Promise((resolve, reject): void => {
     fn.apply(
       null,
       params.concat((result: unknown) => {
@@ -8,11 +9,11 @@ const promisify = (fn: Function, ...params: unknown[]): Promise<unknown> =>
         }
         return resolve(result);
       }),
-    ),
-  );
+    );
+  });
 
 export const chromeRuntimeSendMessageToContentScript = (
-  message: object,
+  message: Record<string, unknown>,
 ): Promise<unknown> =>
   new Promise((resolve, reject): void => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -28,10 +29,14 @@ export const chromeRuntimeSendMessageToContentScript = (
     });
   });
 
-export const chromeRuntimeSendMessage = (message: object): Promise<unknown> =>
+export const chromeRuntimeSendMessage = (
+  message: Record<string, unknown>,
+): Promise<unknown> =>
   promisify(chrome.runtime.sendMessage.bind(chrome.runtime), message);
 
-export const chromeStorageSyncSet = (items: object): Promise<unknown> =>
+export const chromeStorageSyncSet = (
+  items: Record<string, unknown>,
+): Promise<unknown> =>
   promisify(chrome.storage.sync.set.bind(chrome.storage.sync), items);
 
 export const chromeStorageSyncGet = (
@@ -42,7 +47,9 @@ export const chromeStorageSyncGet = (
 export const chromeStorageSyncClear = (): Promise<unknown> =>
   promisify(chrome.storage.sync.clear.bind(chrome.storage.sync));
 
-export const chromeTabsQuery = (query: object): Promise<chrome.tabs.Tab[]> =>
+export const chromeTabsQuery = (
+  query: Record<string, unknown>,
+): Promise<chrome.tabs.Tab[]> =>
   promisify(chrome.tabs.query.bind(chrome.tabs), query) as Promise<
     chrome.tabs.Tab[]
   >;

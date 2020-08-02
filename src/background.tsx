@@ -13,7 +13,8 @@ import {
   GetRemindersByKeywordsRequest,
   SaveReminderRequest,
 } from './common';
-import { UnreachableCaseError, collectWordStems } from './utils';
+import { UnreachableCaseError } from './utils';
+import { collectWordStems } from './stemming';
 import {
   chromeStorageSyncSet,
   chromeStorageSyncGet,
@@ -493,7 +494,7 @@ const addMessageListener = (
 // Initialize ReminderStore, KeywordMap, and ReminderURLMap by loading data
 // from storage. Then pass all useful data to addMessageListener where all
 // of the useful business logic event handlers are created.
-loadDataFromStorage().then((data: UserData) => {
+void loadDataFromStorage().then((data: UserData) => {
   console.log(
     'Extension is being initialized. The following data was retrieved from local storage:',
   );

@@ -1,4 +1,4 @@
-import { collectWordStems } from './utils';
+import { collectWordStems } from './stemming';
 
 /**
  * A collection of parameters that can be used to create a `Reminder`.
@@ -62,13 +62,13 @@ export class Reminder {
   }
 
   static fromJSON(jsonStr: string): Reminder {
-    const json: {
+    const json = JSON.parse(jsonStr) as {
       id: number;
       url: string;
       title: string;
       description: string;
       keywords: string[];
-    } = JSON.parse(jsonStr);
+    };
     return new Reminder(
       json.id,
       json.url,
@@ -91,7 +91,7 @@ export class ReminderStore {
   _currentId: number;
 
   constructor(startingId: number) {
-    this._data = new Map();
+    this._data = new Map<number, Reminder>();
     this._currentId = startingId;
   }
 
@@ -182,7 +182,7 @@ export class KeywordMap {
   _data: Map<string, Set<number>>;
 
   constructor() {
-    this._data = new Map();
+    this._data = new Map<string, Set<number>>();
   }
 
   add(reminder: Reminder): void {
@@ -270,7 +270,7 @@ export class ReminderURLMap {
   _data: Map<string, number>;
 
   constructor() {
-    this._data = new Map();
+    this._data = new Map<string, number>();
   }
 
   add(reminder: Reminder): void {

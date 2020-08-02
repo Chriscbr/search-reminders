@@ -34,7 +34,7 @@ module.exports = {
       },
     ],
 
-    '@typescript-eslint/class-name-casing': ['error'],
+    '@typescript-eslint/restrict-template-expressions': 'off',
 
     // allow unused variables starting with an underscore
     '@typescript-eslint/no-unused-vars': [

@@ -8,7 +8,10 @@ interface MetaTag extends Element {
  * Creates a message listener for handling `GetPageMetadata` requests.
  */
 const addMessageListener = (): void => {
-  chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((req, _sender, sendResponse) => {
+    const request = req as {
+      operation: RequestOperation;
+    };
     if (request.operation === RequestOperation.GetPageMetadata) {
       console.log('Received message GetPageMetadata, handling now.');
       const title = document.title;

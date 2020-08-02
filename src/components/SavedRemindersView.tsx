@@ -13,7 +13,7 @@ export const SavedRemindersView = (
   const { getAllReminders } = props;
 
   useEffect(() => {
-    (async (): Promise<void> => {
+    void (async (): Promise<void> => {
       const response = await getAllReminders();
       setReminders(response);
     })();
