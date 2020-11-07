@@ -46,6 +46,7 @@ want to test changes, by clicking on the refresh button on
 ## TODOs
 
 - [High]: Add ability on options page to see list of saved pages
+- [Med]: Move off of material-ui-chip-input library since it isn't being updated
 - [Med]: Add debug mode which enables/disables logging functions (independent
   of whether built in dev mode or not)
 - [Med]: Put components into different subdirectories
